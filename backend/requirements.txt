@@ -1,5 +1,7 @@
 fastapi
 uvicorn
-pydantic
+pydantic[email]
 python-dotenv
 google-generativeai
+bcrypt
+resend
