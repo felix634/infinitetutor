@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Sparkles, User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
 
@@ -56,12 +57,16 @@ export default function Header() {
                 {/* Logo */}
                 <button
                     onClick={() => router.push('/')}
-                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                 >
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-emerald-500 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
-                        <Sparkles size={20} />
-                    </div>
-                    <span className="text-xl font-black tracking-tight">InfiniteTutor</span>
+                    <Image
+                        src="/logo.png"
+                        alt="InfiniteTutor"
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 object-contain"
+                    />
+                    <span className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#2AB7CA] to-[#FED766]">InfiniteTutor</span>
                 </button>
 
                 {/* Navigation */}
@@ -85,8 +90,8 @@ export default function Header() {
                             <button
                                 onClick={() => router.push('/dashboard')}
                                 className={cn(
-                                    "text-slate-400 hover:text-white transition-colors",
-                                    pathname === '/dashboard' && "text-indigo-400"
+                                    "text-slate-400 hover:text-[#2AB7CA] transition-colors",
+                                    pathname === '/dashboard' && "text-[#2AB7CA]"
                                 )}
                             >
                                 Dashboard
@@ -100,7 +105,7 @@ export default function Header() {
                             <button
                                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                                 className={cn(
-                                    "w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-indigo-500/20 hover:scale-105 transition-transform",
+                                    "w-10 h-10 rounded-full bg-gradient-to-br from-[#2AB7CA] to-[#FED766] flex items-center justify-center text-[#0B0C10] font-bold text-sm shadow-lg shadow-[#2AB7CA]/20 hover:scale-105 transition-transform",
                                     showProfileMenu && "ring-2 ring-white/20"
                                 )}
                             >

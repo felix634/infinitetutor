@@ -116,7 +116,7 @@ export default function IntakeWizard() {
                 {/* Progress Bar */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-white/5">
                     <motion.div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500"
+                        className="h-full bg-gradient-to-r from-[#2AB7CA] to-[#FED766]"
                         initial={{ width: '0%' }}
                         animate={{ width: `${((currentIndex + 1) / steps.length) * 100}%` }}
                     />
@@ -136,7 +136,7 @@ export default function IntakeWizard() {
                         {step === 'topic' && (
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-indigo-400 mb-2">
+                                    <div className="flex items-center gap-2 text-[#2AB7CA] mb-2">
                                         <Brain size={20} />
                                         <span className="text-sm font-medium tracking-wider uppercase">Step 1: The Vision</span>
                                     </div>
@@ -146,7 +146,7 @@ export default function IntakeWizard() {
                                 <input
                                     type="text"
                                     placeholder="e.g. Molecular Gastronomy"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-xl focus:outline-none focus:ring-2 focus:ring-[#2AB7CA] transition-all"
                                     value={formData.topic}
                                     onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
                                     autoFocus
@@ -157,7 +157,7 @@ export default function IntakeWizard() {
                         {step === 'level' && (
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-emerald-400 mb-2">
+                                    <div className="flex items-center gap-2 text-[#FED766] mb-2">
                                         <Target size={20} />
                                         <span className="text-sm font-medium tracking-wider uppercase">Step 2: Expertise</span>
                                     </div>
@@ -172,14 +172,14 @@ export default function IntakeWizard() {
                                             className={cn(
                                                 "w-full text-left px-6 py-4 rounded-xl border transition-all flex items-center justify-between group",
                                                 formData.level === l
-                                                    ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-100"
+                                                    ? "bg-[#2AB7CA]/20 border-[#2AB7CA]/50 text-[#2AB7CA]"
                                                     : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10"
                                             )}
                                         >
                                             <span className="text-lg font-medium">{l}</span>
                                             <div className={cn(
                                                 "w-4 h-4 rounded-full border-2 transition-all",
-                                                formData.level === l ? "bg-indigo-500 border-indigo-400" : "border-white/20"
+                                                formData.level === l ? "bg-[#2AB7CA] border-[#2AB7CA]" : "border-white/20"
                                             )} />
                                         </button>
                                     ))}
@@ -190,7 +190,7 @@ export default function IntakeWizard() {
                         {step === 'time' && (
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-indigo-400 mb-2">
+                                    <div className="flex items-center gap-2 text-[#2AB7CA] mb-2">
                                         <Clock size={20} />
                                         <span className="text-sm font-medium tracking-wider uppercase">Step 3: Commitment</span>
                                     </div>
@@ -199,7 +199,7 @@ export default function IntakeWizard() {
                                 </div>
                                 <div className="space-y-8">
                                     <div className="flex justify-between items-end">
-                                        <span className="text-5xl font-bold text-emerald-400">{formData.daily_minutes}</span>
+                                        <span className="text-5xl font-bold text-[#FED766]">{formData.daily_minutes}</span>
                                         <span className="text-xl text-muted-foreground mb-1">minutes / day</span>
                                     </div>
                                     <input
@@ -209,7 +209,7 @@ export default function IntakeWizard() {
                                         step="15"
                                         value={formData.daily_minutes}
                                         onChange={(e) => setFormData({ ...formData, daily_minutes: parseInt(e.target.value) })}
-                                        className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                                        className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#2AB7CA]"
                                     />
                                     <div className="flex justify-between text-xs text-muted-foreground uppercase tracking-widest">
                                         <span>15m (Bite-sized)</span>
@@ -237,7 +237,7 @@ export default function IntakeWizard() {
                     <button
                         onClick={next}
                         disabled={loading || (step === 'topic' && !formData.topic)}
-                        className="flex items-center gap-2 bg-white text-black px-8 py-3 rounded-xl hover:bg-indigo-400 hover:text-white transition-all font-bold shadow-xl shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 bg-gradient-to-r from-[#2AB7CA] to-[#FED766] text-[#0B0C10] px-8 py-3 rounded-xl hover:opacity-90 transition-all font-bold shadow-xl shadow-[#2AB7CA]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">
@@ -248,7 +248,7 @@ export default function IntakeWizard() {
                             <>
                                 {currentIndex === steps.length - 1 ? 'Generate Syllabus' : 'Continue'}
                                 {currentIndex !== steps.length - 1 && <ChevronRight size={20} />}
-                                {currentIndex === steps.length - 1 && <Sparkles size={18} className="text-emerald-500" />}
+                                {currentIndex === steps.length - 1 && <Sparkles size={18} className="text-[#0B0C10]" />}
                             </>
                         )}
                     </button>
