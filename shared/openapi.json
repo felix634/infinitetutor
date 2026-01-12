@@ -1,0 +1,59 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "The Infinite Tutor API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/generate-syllabus": {
+      "post": {
+        "summary": "Generate a syllabus based on topic and user level.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "topic": { "type": "string" },
+                  "level": { "type": "string" },
+                  "daily_minutes": { "type": "integer" }
+                },
+                "required": ["topic", "level", "daily_minutes"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Syllabus Object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "course_id": { "type": "string" },
+                    "title": { "type": "string" },
+                    "chapters": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "string" },
+                          "title": { "type": "string" },
+                          "lessons": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

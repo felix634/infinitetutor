@@ -1,0 +1,258 @@
+'use client';
+
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight, ChevronLeft, Sparkles, Brain, Clock, Target } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+
+type Step = 'topic' | 'level' | 'time';
+
+interface FormData {
+    topic: string;
+    level: string;
+    daily_minutes: number;
+}
+
+export default function IntakeWizard() {
+    const [step, setStep] = useState<Step>('topic');
+    const [formData, setFormData] = useState<FormData>({
+        topic: '',
+        level: 'Beginner',
+        daily_minutes: 30,
+    });
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
+
+    const steps: Step[] = ['topic', 'level', 'time'];
+    const currentIndex = steps.indexOf(step);
+
+    const next = () => {
+        if (currentIndex < steps.length - 1) {
+            setStep(steps[currentIndex + 1]);
+        } else {
+            handleSubmit();
+        }
+    };
+
+    const prev = () => {
+        if (currentIndex > 0) {
+            setStep(steps[currentIndex - 1]);
+        }
+    };
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('http://localhost:8000/generate-syllabus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            const data = await response.json();
+            console.log('Syllabus generated:', data);
+
+            // Save to localStorage for the dashboard to pick up
+            localStorage.setItem('current_course', JSON.stringify({
+                ...data,
+                topic: formData.topic,
+                level: formData.level
+            }));
+
+            // If user is logged in, save course to their profile
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                try {
+                    await fetch('http://localhost:8000/user/save-course', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            course_id: data.course_id,
+                            title: data.title,
+                            topic: formData.topic,
+                            level: formData.level,
+                            progress_percent: 0,
+                            chapters: data.chapters || []
+                        }),
+                    });
+                } catch (err) {
+                    console.log('Could not save to profile (user may not be logged in)');
+                }
+            }
+
+            // Navigate to the dashboard
+            router.push(`/course/${data.course_id}`);
+        } catch (error) {
+            console.error('Error generating syllabus:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const variants = {
+        enter: (direction: number) => ({
+            x: direction > 0 ? 50 : -50,
+            opacity: 0,
+        }),
+        center: {
+            x: 0,
+            opacity: 1,
+        },
+        exit: (direction: number) => ({
+            x: direction < 0 ? 50 : -50,
+            opacity: 0,
+        }),
+    };
+
+    const direction = 1; // Simplified for now
+
+    return (
+        <div className="w-full max-w-xl mx-auto">
+            <div className="glass-dark rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                {/* Progress Bar */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-white/5">
+                    <motion.div
+                        className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500"
+                        initial={{ width: '0%' }}
+                        animate={{ width: `${((currentIndex + 1) / steps.length) * 100}%` }}
+                    />
+                </div>
+
+                <AnimatePresence mode="wait" custom={direction}>
+                    <motion.div
+                        key={step}
+                        custom={direction}
+                        variants={variants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        className="space-y-8"
+                    >
+                        {step === 'topic' && (
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-indigo-400 mb-2">
+                                        <Brain size={20} />
+                                        <span className="text-sm font-medium tracking-wider uppercase">Step 1: The Vision</span>
+                                    </div>
+                                    <h2 className="text-3xl font-bold">What do you want to master?</h2>
+                                    <p className="text-muted-foreground">Quantum physics, sourdough baking, or ancient history—the choice is yours.</p>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Molecular Gastronomy"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                                    value={formData.topic}
+                                    onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                                    autoFocus
+                                />
+                            </div>
+                        )}
+
+                        {step === 'level' && (
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-emerald-400 mb-2">
+                                        <Target size={20} />
+                                        <span className="text-sm font-medium tracking-wider uppercase">Step 2: Expertise</span>
+                                    </div>
+                                    <h2 className="text-3xl font-bold">Your current level?</h2>
+                                    <p className="text-muted-foreground">We&apos;ll tailor the complexity to your background.</p>
+                                </div>
+                                <div className="grid grid-cols-1 gap-4">
+                                    {['Beginner', 'Intermediate', 'Advanced', 'Expert'].map((l) => (
+                                        <button
+                                            key={l}
+                                            onClick={() => setFormData({ ...formData, level: l })}
+                                            className={cn(
+                                                "w-full text-left px-6 py-4 rounded-xl border transition-all flex items-center justify-between group",
+                                                formData.level === l
+                                                    ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-100"
+                                                    : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10"
+                                            )}
+                                        >
+                                            <span className="text-lg font-medium">{l}</span>
+                                            <div className={cn(
+                                                "w-4 h-4 rounded-full border-2 transition-all",
+                                                formData.level === l ? "bg-indigo-500 border-indigo-400" : "border-white/20"
+                                            )} />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {step === 'time' && (
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-indigo-400 mb-2">
+                                        <Clock size={20} />
+                                        <span className="text-sm font-medium tracking-wider uppercase">Step 3: Commitment</span>
+                                    </div>
+                                    <h2 className="text-3xl font-bold">Daily time investment?</h2>
+                                    <p className="text-muted-foreground">Tell us how much time you can dedicate each day.</p>
+                                </div>
+                                <div className="space-y-8">
+                                    <div className="flex justify-between items-end">
+                                        <span className="text-5xl font-bold text-emerald-400">{formData.daily_minutes}</span>
+                                        <span className="text-xl text-muted-foreground mb-1">minutes / day</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="15"
+                                        max="120"
+                                        step="15"
+                                        value={formData.daily_minutes}
+                                        onChange={(e) => setFormData({ ...formData, daily_minutes: parseInt(e.target.value) })}
+                                        className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                                    />
+                                    <div className="flex justify-between text-xs text-muted-foreground uppercase tracking-widest">
+                                        <span>15m (Bite-sized)</span>
+                                        <span>120m (Deep Dive)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+
+                <div className="mt-12 flex items-center justify-between">
+                    <button
+                        onClick={prev}
+                        disabled={currentIndex === 0}
+                        className={cn(
+                            "flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-medium",
+                            currentIndex === 0 ? "opacity-0 pointer-events-none" : "hover:bg-white/5 text-muted-foreground"
+                        )}
+                    >
+                        <ChevronLeft size={20} />
+                        Back
+                    </button>
+
+                    <button
+                        onClick={next}
+                        disabled={loading || (step === 'topic' && !formData.topic)}
+                        className="flex items-center gap-2 bg-white text-black px-8 py-3 rounded-xl hover:bg-indigo-400 hover:text-white transition-all font-bold shadow-xl shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {loading ? (
+                            <span className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                                Generating...
+                            </span>
+                        ) : (
+                            <>
+                                {currentIndex === steps.length - 1 ? 'Generate Syllabus' : 'Continue'}
+                                {currentIndex !== steps.length - 1 && <ChevronRight size={20} />}
+                                {currentIndex === steps.length - 1 && <Sparkles size={18} className="text-emerald-500" />}
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
