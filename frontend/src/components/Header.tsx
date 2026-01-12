@@ -79,7 +79,7 @@ export default function Header() {
                                 onClick={() => router.push(item.href)}
                                 className={cn(
                                     "text-slate-400 hover:text-white transition-colors",
-                                    pathname === item.href && "text-indigo-400"
+                                    pathname === item.href && "text-[#2AB7CA]"
                                 )}
                             >
                                 {item.label}

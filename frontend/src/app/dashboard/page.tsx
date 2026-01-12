@@ -35,7 +35,7 @@ const getBadgeConfig = (topic: string, level: string) => {
 
     // Icon based on topic
     let Icon = Award;
-    let gradient = 'from-indigo-500 to-purple-500';
+    let gradient = 'from-[#2AB7CA] to-purple-500';
     let category = 'Scholar';
 
     if (topicLower.includes('math') || topicLower.includes('calcul') || topicLower.includes('algebra')) {
@@ -56,11 +56,11 @@ const getBadgeConfig = (topic: string, level: string) => {
         category = 'Artist';
     } else if (topicLower.includes('code') || topicLower.includes('program') || topicLower.includes('software') || topicLower.includes('python') || topicLower.includes('javascript')) {
         Icon = Rocket;
-        gradient = 'from-emerald-500 to-teal-500';
+        gradient = 'from-[#FED766] to-teal-500';
         category = 'Developer';
     } else if (topicLower.includes('business') || topicLower.includes('marketing') || topicLower.includes('finance')) {
         Icon = Target;
-        gradient = 'from-green-500 to-emerald-500';
+        gradient = 'from-green-500 to-[#FED766]';
         category = 'Strategist';
     } else if (topicLower.includes('language') || topicLower.includes('english') || topicLower.includes('spanish') || topicLower.includes('french')) {
         Icon = Star;
@@ -76,7 +76,7 @@ const getBadgeConfig = (topic: string, level: string) => {
         category = 'Chef';
     } else if (topicLower.includes('invent') || topicLower.includes('vinci') || topicLower.includes('engineer')) {
         Icon = Crown;
-        gradient = 'from-indigo-500 to-blue-500';
+        gradient = 'from-[#2AB7CA] to-blue-500';
         category = 'Inventor';
     }
 
@@ -190,9 +190,9 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+            <div className="min-h-screen bg-[#0B0C10] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-6">
-                    <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-16 h-16 border-4 border-[#2AB7CA] border-t-transparent rounded-full animate-spin" />
                     <p className="text-slate-400 font-medium animate-pulse">Loading your dashboard...</p>
                 </div>
             </div>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#020617] text-slate-50">
+        <div className="min-h-screen bg-[#0B0C10] text-slate-50">
             <Header />
 
             <main className="pt-28 pb-16 px-6 max-w-7xl mx-auto">
@@ -228,7 +228,7 @@ export default function DashboardPage() {
                         className={cn(
                             "flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all",
                             activeTab === 'progress'
-                                ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
+                                ? "bg-[#2AB7CA] text-white shadow-lg shadow-[#2AB7CA]/20"
                                 : "text-slate-400 hover:text-white hover:bg-white/5"
                         )}
                     >
@@ -273,12 +273,12 @@ export default function DashboardPage() {
                                 <section>
                                     <div className="flex items-center justify-between mb-6">
                                         <div className="flex items-center gap-3">
-                                            <BookOpen className="text-indigo-400" size={24} />
+                                            <BookOpen className="text-[#2AB7CA]" size={24} />
                                             <h2 className="text-2xl font-bold">My Courses</h2>
                                         </div>
                                         <button
                                             onClick={() => router.push('/')}
-                                            className="flex items-center gap-2 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+                                            className="flex items-center gap-2 text-sm font-medium text-[#2AB7CA] hover:text-[#2AB7CA] transition-colors"
                                         >
                                             <Plus size={16} />
                                             New Course
@@ -287,8 +287,8 @@ export default function DashboardPage() {
 
                                     {inProgressCourses.length === 0 ? (
                                         <div className="glass-dark border border-white/5 rounded-[2rem] p-12 text-center">
-                                            <div className="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center mx-auto mb-6">
-                                                <GraduationCap className="text-indigo-400" size={40} />
+                                            <div className="w-20 h-20 rounded-full bg-[#2AB7CA]/10 flex items-center justify-center mx-auto mb-6">
+                                                <GraduationCap className="text-[#2AB7CA]" size={40} />
                                             </div>
                                             <h3 className="text-xl font-bold mb-2">No courses in progress</h3>
                                             <p className="text-slate-400 mb-6">
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                                             </p>
                                             <button
                                                 onClick={() => router.push('/')}
-                                                className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl transition-all"
+                                                className="inline-flex items-center gap-2 bg-[#2AB7CA] hover:bg-[#2AB7CA] text-white font-bold px-6 py-3 rounded-xl transition-all"
                                             >
                                                 <Plus size={18} />
                                                 Create Your First Course
@@ -311,11 +311,11 @@ export default function DashboardPage() {
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: index * 0.1 }}
                                                     onClick={() => handleContinueCourse(course)}
-                                                    className="glass-dark border border-white/5 rounded-2xl p-6 hover:border-indigo-500/30 transition-all cursor-pointer group"
+                                                    className="glass-dark border border-white/5 rounded-2xl p-6 hover:border-[#2AB7CA]/30 transition-all cursor-pointer group"
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex-1">
-                                                            <h3 className="text-lg font-bold group-hover:text-indigo-400 transition-colors">
+                                                            <h3 className="text-lg font-bold group-hover:text-[#2AB7CA] transition-colors">
                                                                 {course.title}
                                                             </h3>
                                                             <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
@@ -353,8 +353,8 @@ export default function DashboardPage() {
                                                                     />
                                                                     <defs>
                                                                         <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                                            <stop offset="0%" stopColor="#6366f1" />
-                                                                            <stop offset="100%" stopColor="#10b981" />
+                                                                            <stop offset="0%" stopColor="#2AB7CA" />
+                                                                            <stop offset="100%" stopColor="#FED766" />
                                                                         </linearGradient>
                                                                     </defs>
                                                                 </svg>
@@ -362,7 +362,7 @@ export default function DashboardPage() {
                                                                     {course.progress_percent}%
                                                                 </span>
                                                             </div>
-                                                            <ChevronRight className="text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                                                            <ChevronRight className="text-slate-500 group-hover:text-[#2AB7CA] group-hover:translate-x-1 transition-all" />
                                                         </div>
                                                     </div>
                                                 </motion.div>
@@ -376,8 +376,8 @@ export default function DashboardPage() {
                             <aside className="space-y-6">
                                 <div className="glass-dark border border-white/5 rounded-[2rem] p-6">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                                            <Lightbulb className="text-emerald-400" size={20} />
+                                        <div className="w-10 h-10 rounded-xl bg-[#FED766]/20 flex items-center justify-center">
+                                            <Lightbulb className="text-[#FED766]" size={20} />
                                         </div>
                                         <h2 className="text-lg font-bold">Suggested For You</h2>
                                     </div>
@@ -395,12 +395,12 @@ export default function DashboardPage() {
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: 0.3 + index * 0.1 }}
                                                     onClick={() => handleStartCourse(suggestion)}
-                                                    className="w-full text-left p-4 rounded-xl bg-white/5 hover:bg-emerald-500/10 border border-transparent hover:border-emerald-500/20 transition-all group"
+                                                    className="w-full text-left p-4 rounded-xl bg-white/5 hover:bg-[#FED766]/10 border border-transparent hover:border-[#FED766]/20 transition-all group"
                                                 >
                                                     <div className="flex items-start gap-3">
-                                                        <TrendingUp className="text-emerald-400 mt-1 shrink-0" size={16} />
+                                                        <TrendingUp className="text-[#FED766] mt-1 shrink-0" size={16} />
                                                         <div>
-                                                            <h3 className="font-semibold group-hover:text-emerald-400 transition-colors">
+                                                            <h3 className="font-semibold group-hover:text-[#FED766] transition-colors">
                                                                 {suggestion.title}
                                                             </h3>
                                                             <p className="text-sm text-slate-400 mt-1">
@@ -424,7 +424,7 @@ export default function DashboardPage() {
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-slate-400">Completed</span>
-                                            <span className="font-bold text-2xl text-emerald-400">{completedCourses.length}</span>
+                                            <span className="font-bold text-2xl text-[#FED766]">{completedCourses.length}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -495,7 +495,7 @@ export default function DashboardPage() {
                                                         )}>
                                                             <BadgeIcon className="text-white" size={44} />
                                                         </div>
-                                                        <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center border-4 border-[#020617]">
+                                                        <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center border-4 border-[#0B0C10]">
                                                             <Star className="text-white" size={16} fill="white" />
                                                         </div>
                                                     </div>

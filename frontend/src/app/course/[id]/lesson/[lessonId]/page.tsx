@@ -74,9 +74,9 @@ export default function LessonPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+            <div className="min-h-screen bg-[#0B0C10] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-6">
-                    <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-16 h-16 border-4 border-[#2AB7CA] border-t-transparent rounded-full animate-spin" />
                     <p className="text-slate-400 font-medium animate-pulse">Generating your interactive lesson...</p>
                 </div>
             </div>
@@ -86,7 +86,7 @@ export default function LessonPage() {
     if (!content) return null;
 
     return (
-        <div className="min-h-screen bg-[#020617] text-slate-50">
+        <div className="min-h-screen bg-[#0B0C10] text-slate-50">
             <Header />
 
             <main className="pt-32 pb-24 px-6 max-w-4xl mx-auto space-y-16">
@@ -97,7 +97,7 @@ export default function LessonPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-4"
                     >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-tighter">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 text-[#2AB7CA] text-xs font-bold uppercase tracking-tighter">
                             Lesson Content
                         </div>
                         <h1 className="text-5xl font-black tracking-tight leading-tight">
@@ -123,13 +123,13 @@ export default function LessonPage() {
                 {/* Visual Model */}
                 <section className="space-y-8">
                     <div className="flex items-center gap-3">
-                        <Zap className="text-emerald-400" size={24} />
+                        <Zap className="text-[#FED766]" size={24} />
                         <h2 className="text-2xl font-bold">Visual Mental Model</h2>
                     </div>
                     <div className="glass-dark border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
                         <MermaidRenderer chart={content.mermaid_code} />
-                        <div className="mt-8 flex gap-4 p-6 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl">
-                            <Info className="text-indigo-400 shrink-0" size={20} />
+                        <div className="mt-8 flex gap-4 p-6 bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 rounded-2xl">
+                            <Info className="text-[#2AB7CA] shrink-0" size={20} />
                             <p className="text-slate-400 text-sm leading-relaxed">
                                 This diagram summarizes the relationship between the key concepts of {content.lesson_title}.
                             </p>
@@ -139,13 +139,13 @@ export default function LessonPage() {
 
                 {/* Footer / Quiz Trigger */}
                 <section className="pt-12">
-                    <div className="glass-dark border border-indigo-500/30 rounded-[3rem] p-12 text-center space-y-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[100px] -mr-32 -mt-32 rounded-full" />
+                    <div className="glass-dark border border-[#2AB7CA]/30 rounded-[3rem] p-12 text-center space-y-8 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#2AB7CA]/10 blur-[100px] -mr-32 -mt-32 rounded-full" />
 
                         <div className="max-w-xl mx-auto space-y-6 relative z-10">
                             {isPassed ? (
                                 <div className="space-y-4">
-                                    <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mx-auto shadow-lg shadow-emerald-500/20">
+                                    <div className="w-20 h-20 bg-[#FED766]/20 rounded-full flex items-center justify-center text-[#FED766] mx-auto shadow-lg shadow-[#FED766]/20">
                                         <CheckCircle2 size={40} />
                                     </div>
                                     <h3 className="text-3xl font-black">Lesson Mastered!</h3>
@@ -154,7 +154,7 @@ export default function LessonPage() {
                                     </p>
                                     <button
                                         onClick={() => router.back()}
-                                        className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-indigo-500/20"
+                                        className="inline-flex items-center gap-2 bg-[#2AB7CA] hover:bg-indigo-600 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-[#2AB7CA]/20"
                                     >
                                         Return to Dashboard
                                         <ChevronRight size={20} />
@@ -162,7 +162,7 @@ export default function LessonPage() {
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    <div className="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 mx-auto shadow-lg shadow-indigo-500/20">
+                                    <div className="w-20 h-20 bg-[#2AB7CA]/20 rounded-full flex items-center justify-center text-[#2AB7CA] mx-auto shadow-lg shadow-[#2AB7CA]/20">
                                         <PlayCircle size={40} />
                                     </div>
                                     <h3 className="text-3xl font-black">Knowledge Check</h3>
@@ -171,7 +171,7 @@ export default function LessonPage() {
                                     </p>
                                     <button
                                         onClick={() => setIsQuizOpen(true)}
-                                        className="w-full bg-white text-black font-bold py-5 rounded-2xl hover:bg-indigo-500 hover:text-white transition-all shadow-2xl flex items-center justify-center gap-3 group"
+                                        className="w-full bg-white text-black font-bold py-5 rounded-2xl hover:bg-[#2AB7CA] hover:text-white transition-all shadow-2xl flex items-center justify-center gap-3 group"
                                     >
                                         <span className="text-lg">Take the Quiz</span>
                                         <ChevronRight className="group-hover:translate-x-1 transition-transform" />

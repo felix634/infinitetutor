@@ -16,7 +16,7 @@ const steps = [
         title: 'Tell Us What You Want to Learn',
         description: 'Enter any topic—from quantum physics to Renaissance art. Specify your current level and how much time you can dedicate.',
         icon: Lightbulb,
-        gradient: 'from-indigo-500 to-purple-500'
+        gradient: 'from-[#2AB7CA] to-purple-500'
     },
     {
         number: '02',
@@ -70,26 +70,26 @@ export default function HowItWorksPage() {
     const router = useRouter();
 
     return (
-        <div className="min-h-screen bg-[#020617] text-slate-50">
+        <div className="min-h-screen bg-[#0B0C10] text-slate-50">
             <Header />
 
             {/* Hero Section */}
             <section className="pt-32 pb-20 px-6 relative overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[150px]" />
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-[150px]" />
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#2AB7CA]/20 rounded-full blur-[150px]" />
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FED766]/20 rounded-full blur-[150px]" />
 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-8">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 text-[#2AB7CA] text-sm font-medium mb-8">
                             <Sparkles size={14} />
                             <span>How InfiniteTutor Works</span>
                         </div>
 
                         <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
-                            Master Anything in <span className="bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">5 Simple Steps</span>
+                            Master Anything in <span className="bg-gradient-to-r from-[#2AB7CA] to-[#FED766] bg-clip-text text-transparent">5 Simple Steps</span>
                         </h1>
 
                         <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
@@ -112,7 +112,7 @@ export default function HowItWorksPage() {
                                 transition={{ delay: index * 0.1 }}
                                 className="relative"
                             >
-                                <div className="glass-dark border border-white/5 rounded-[2rem] p-8 md:p-12 flex flex-col md:flex-row gap-8 items-start group hover:border-indigo-500/20 transition-all">
+                                <div className="glass-dark border border-white/5 rounded-[2rem] p-8 md:p-12 flex flex-col md:flex-row gap-8 items-start group hover:border-[#2AB7CA]/20 transition-all">
                                     {/* Step Number */}
                                     <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${step.gradient} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
                                         <step.icon className="text-white" size={36} />
@@ -165,10 +165,10 @@ export default function HowItWorksPage() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
-                                className="glass-dark border border-white/5 rounded-[2rem] p-8 text-center group hover:border-indigo-500/20 transition-all"
+                                className="glass-dark border border-white/5 rounded-[2rem] p-8 text-center group hover:border-[#2AB7CA]/20 transition-all"
                             >
-                                <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                                    <feature.icon className="text-indigo-400" size={32} />
+                                <div className="w-16 h-16 rounded-2xl bg-[#2AB7CA]/10 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                                    <feature.icon className="text-[#2AB7CA]" size={32} />
                                 </div>
                                 <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
                                 <p className="text-slate-400">{feature.description}</p>
@@ -185,9 +185,9 @@ export default function HowItWorksPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="glass-dark border border-indigo-500/20 rounded-[2.5rem] p-12 text-center relative overflow-hidden"
+                        className="glass-dark border border-[#2AB7CA]/20 rounded-[2.5rem] p-12 text-center relative overflow-hidden"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-emerald-500/10" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#2AB7CA]/10 to-[#FED766]/10" />
 
                         <div className="relative z-10">
                             <h2 className="text-4xl font-black mb-4">Ready to Start Learning?</h2>
@@ -197,7 +197,7 @@ export default function HowItWorksPage() {
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <button
                                     onClick={() => router.push('/')}
-                                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-600 hover:to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-indigo-500/20"
+                                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#2AB7CA] to-[#FED766] hover:from-[#2AB7CA] hover:to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-[#2AB7CA]/20"
                                 >
                                     Start Learning Free
                                     <ArrowRight size={18} />

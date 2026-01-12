@@ -172,7 +172,7 @@ export default function SettingsPage() {
     return (
         <div className={cn(
             "min-h-screen transition-colors",
-            theme === 'light' ? "bg-slate-100 text-slate-900" : "bg-[#020617] text-slate-50"
+            theme === 'light' ? "bg-slate-100 text-slate-900" : "bg-[#0B0C10] text-slate-50"
         )}>
             <Header />
 
@@ -216,7 +216,7 @@ export default function SettingsPage() {
                     )}
                 >
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-emerald-500 flex items-center justify-center text-2xl font-bold text-white">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2AB7CA] to-[#FED766] flex items-center justify-center text-2xl font-bold text-white">
                             {userEmail.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1">
@@ -255,7 +255,7 @@ export default function SettingsPage() {
                     )}
                 >
                     <div className="flex items-center gap-3 mb-6">
-                        <Palette className="text-indigo-400" size={24} />
+                        <Palette className="text-[#2AB7CA]" size={24} />
                         <h2 className="text-xl font-bold">Appearance</h2>
                     </div>
 
@@ -271,7 +271,7 @@ export default function SettingsPage() {
                                 className={cn(
                                     "flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all",
                                     theme === option.value
-                                        ? "border-indigo-500 bg-indigo-500/10"
+                                        ? "border-[#2AB7CA] bg-[#2AB7CA]/10"
                                         : theme === 'light'
                                             ? "border-slate-200 hover:border-slate-300 bg-slate-50"
                                             : "border-white/5 hover:border-white/10 bg-white/5"
@@ -279,11 +279,11 @@ export default function SettingsPage() {
                             >
                                 <option.icon
                                     size={28}
-                                    className={theme === option.value ? "text-indigo-400" : ""}
+                                    className={theme === option.value ? "text-[#2AB7CA]" : ""}
                                 />
                                 <span className="font-medium">{option.label}</span>
                                 {theme === option.value && (
-                                    <span className="text-xs text-indigo-400 font-bold">Active</span>
+                                    <span className="text-xs text-[#2AB7CA] font-bold">Active</span>
                                 )}
                             </button>
                         ))}
@@ -305,7 +305,7 @@ export default function SettingsPage() {
                         )}
                     >
                         <div className="flex items-center gap-3 mb-6">
-                            <section.icon className="text-indigo-400" size={24} />
+                            <section.icon className="text-[#2AB7CA]" size={24} />
                             <h2 className="text-xl font-bold">{section.title}</h2>
                         </div>
 
@@ -343,7 +343,7 @@ export default function SettingsPage() {
                                             className={cn(
                                                 "w-12 h-7 rounded-full transition-colors relative",
                                                 item.value
-                                                    ? "bg-indigo-500"
+                                                    ? "bg-[#2AB7CA]"
                                                     : theme === 'light' ? "bg-slate-300" : "bg-slate-700"
                                             )}
                                         >

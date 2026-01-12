@@ -97,14 +97,14 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#020617] flex flex-col relative overflow-hidden">
+        <div className="min-h-screen bg-[#0B0C10] flex flex-col relative overflow-hidden">
             {/* Header */}
             <header className="fixed top-0 w-full z-50 px-6 py-4">
                 <button
                     onClick={() => router.push('/')}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                 >
-                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-emerald-500 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#2AB7CA] to-[#FED766] rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-[#2AB7CA]/20">
                         <Sparkles size={20} />
                     </div>
                     <span className="text-xl font-black tracking-tight text-white">InfiniteTutor</span>
@@ -114,8 +114,8 @@ export default function LoginPage() {
             <div className="flex-1 flex items-center justify-center px-6">
                 {/* Background Effects */}
                 <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[150px]" />
-                    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-[150px]" />
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#2AB7CA]/20 rounded-full blur-[150px]" />
+                    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FED766]/20 rounded-full blur-[150px]" />
                 </div>
 
                 <motion.div
@@ -126,7 +126,7 @@ export default function LoginPage() {
                     {/* Logo */}
                     <div className="text-center mb-12">
                         <div className="inline-flex items-center gap-2 mb-6">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-emerald-500 flex items-center justify-center">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2AB7CA] to-[#FED766] flex items-center justify-center">
                                 <Sparkles className="text-white" size={24} />
                             </div>
                         </div>
@@ -166,7 +166,7 @@ export default function LoginPage() {
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 placeholder="you@example.com"
                                                 required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2AB7CA]/50 focus:border-[#2AB7CA] transition-all"
                                             />
                                         </div>
                                     </div>
@@ -182,7 +182,7 @@ export default function LoginPage() {
                                                 placeholder="••••••••"
                                                 required
                                                 minLength={6}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2AB7CA]/50 focus:border-[#2AB7CA] transition-all"
                                             />
                                             <button
                                                 type="button"
@@ -203,7 +203,7 @@ export default function LoginPage() {
                                     <button
                                         type="submit"
                                         disabled={loading || !email || !password}
-                                        className="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full bg-gradient-to-r from-[#2AB7CA] to-[#2AB7CA] hover:from-[#2AB7CA] hover:to-indigo-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#2AB7CA]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {loading ? (
                                             <Loader2 className="animate-spin" size={20} />
@@ -241,7 +241,7 @@ export default function LoginPage() {
                                     className="space-y-6"
                                 >
                                     {message && (
-                                        <div className="flex items-center gap-3 text-emerald-400 text-sm bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
+                                        <div className="flex items-center gap-3 text-[#FED766] text-sm bg-[#FED766]/10 border border-[#FED766]/20 rounded-xl p-4">
                                             <CheckCircle2 size={20} />
                                             <span>{message}</span>
                                         </div>
@@ -258,7 +258,7 @@ export default function LoginPage() {
                                                 placeholder="Enter 6-digit code"
                                                 required
                                                 maxLength={6}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-center text-2xl tracking-[0.5em] font-mono placeholder:text-slate-500 placeholder:tracking-normal placeholder:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-center text-2xl tracking-[0.5em] font-mono placeholder:text-slate-500 placeholder:tracking-normal placeholder:text-base focus:outline-none focus:ring-2 focus:ring-[#2AB7CA]/50 focus:border-[#2AB7CA] transition-all"
                                             />
                                         </div>
                                     </div>
@@ -272,7 +272,7 @@ export default function LoginPage() {
                                     <button
                                         type="submit"
                                         disabled={loading || code.length !== 6}
-                                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full bg-gradient-to-r from-[#FED766] to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#FED766]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {loading ? (
                                             <Loader2 className="animate-spin" size={20} />

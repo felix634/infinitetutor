@@ -8,39 +8,39 @@ mermaid.initialize({
     theme: 'base',
     securityLevel: 'loose',
     themeVariables: {
-        // Background colors
-        background: '#0f172a',
-        primaryColor: '#1e293b',
-        secondaryColor: '#334155',
-        tertiaryColor: '#475569',
+        // Background colors - using Void Black
+        background: '#0B0C10',
+        primaryColor: '#1a1d24',
+        secondaryColor: '#252a33',
+        tertiaryColor: '#2f3542',
 
         // Text colors - ensure white/light text everywhere
         primaryTextColor: '#f1f5f9',
         secondaryTextColor: '#e2e8f0',
         tertiaryTextColor: '#cbd5e1',
-        lineColor: '#6366f1',
+        lineColor: '#2AB7CA',
 
-        // Node colors
-        nodeBorder: '#6366f1',
-        clusterBkg: '#1e293b',
-        clusterBorder: '#6366f1',
+        // Node colors - Cyber Blue borders
+        nodeBorder: '#2AB7CA',
+        clusterBkg: '#1a1d24',
+        clusterBorder: '#2AB7CA',
 
         // Flowchart specific
         nodeTextColor: '#f1f5f9',
-        mainBkg: '#1e293b',
+        mainBkg: '#1a1d24',
 
         // Edge/Arrow colors
-        edgeLabelBackground: '#1e293b',
+        edgeLabelBackground: '#1a1d24',
 
         // Special node colors override
-        fillType0: '#1e293b',
-        fillType1: '#1e3a5f',
-        fillType2: '#1e3a4f',
-        fillType3: '#1e4a3f',
-        fillType4: '#2e2a4f',
-        fillType5: '#3e2a3f',
-        fillType6: '#1e3a5f',
-        fillType7: '#1e4a4f',
+        fillType0: '#1a1d24',
+        fillType1: '#1a2633',
+        fillType2: '#1a2a30',
+        fillType3: '#1a3328',
+        fillType4: '#251a33',
+        fillType5: '#331a28',
+        fillType6: '#1a2633',
+        fillType7: '#1a3030',
     },
     flowchart: {
         htmlLabels: true,
@@ -76,8 +76,8 @@ export default function MermaidRenderer({ chart }: MermaidRendererProps) {
                         /<style>/,
                         `<style>
                             .node rect, .node circle, .node ellipse, .node polygon, .node path { 
-                                fill: #1e293b !important; 
-                                stroke: #6366f1 !important; 
+                                fill: #1a1d24 !important; 
+                                stroke: #2AB7CA !important; 
                             }
                             .node .label, .nodeLabel, .node text, text.nodeLabel { 
                                 fill: #f1f5f9 !important; 
@@ -86,20 +86,20 @@ export default function MermaidRenderer({ chart }: MermaidRendererProps) {
                             .edgeLabel, .edgeLabel text, .edgeLabel span {
                                 fill: #e2e8f0 !important;
                                 color: #e2e8f0 !important;
-                                background-color: #1e293b !important;
+                                background-color: #1a1d24 !important;
                             }
                             .label text, text {
                                 fill: #f1f5f9 !important;
                             }
                             .cluster rect {
-                                fill: #1e293b !important;
-                                stroke: #6366f1 !important;
+                                fill: #1a1d24 !important;
+                                stroke: #2AB7CA !important;
                             }
                             .flowchart-link {
-                                stroke: #6366f1 !important;
+                                stroke: #2AB7CA !important;
                             }
                             marker path {
-                                fill: #6366f1 !important;
+                                fill: #2AB7CA !important;
                             }
                         `
                     );

@@ -121,7 +121,7 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                 <div className="p-8 md:p-12 overflow-y-auto flex-1">
                     {loading ? (
                         <div className="py-20 flex flex-col items-center justify-center gap-6">
-                            <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                            <div className="w-12 h-12 border-4 border-[#2AB7CA] border-t-transparent rounded-full animate-spin" />
                             <div className="text-center space-y-2">
                                 <h3 className="text-xl font-bold">Constructing Quiz...</h3>
                                 <p className="text-slate-400">Gemini is analyzing the lesson content.</p>
@@ -138,7 +138,7 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                                     className="space-y-8"
                                 >
                                     <div className="space-y-4">
-                                        <div className="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-400">
+                                        <div className="w-16 h-16 bg-[#2AB7CA]/20 rounded-2xl flex items-center justify-center text-[#2AB7CA]">
                                             <Trophy size={32} />
                                         </div>
                                         <h2 className="text-3xl font-black tracking-tight">{lessonTitle}</h2>
@@ -148,7 +148,7 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                                     </div>
                                     <button
                                         onClick={() => setCurrentStep('questions')}
-                                        className="w-full bg-white text-black font-bold py-5 rounded-2xl hover:bg-indigo-500 hover:text-white transition-all shadow-xl shadow-indigo-500/10 flex items-center justify-center gap-2"
+                                        className="w-full bg-white text-black font-bold py-5 rounded-2xl hover:bg-[#2AB7CA] hover:text-white transition-all shadow-xl shadow-[#2AB7CA]/10 flex items-center justify-center gap-2"
                                     >
                                         Start Knowledge Check
                                         <ChevronRight size={20} />
@@ -171,7 +171,7 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                                         </div>
                                         <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                                             <div
-                                                className="h-full bg-indigo-500 transition-all duration-500"
+                                                className="h-full bg-[#2AB7CA] transition-all duration-500"
                                                 style={{ width: `${((currentQuestionIndex + 1) / quiz.questions.length) * 100}%` }}
                                             />
                                         </div>
@@ -192,15 +192,15 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                                                     onClick={() => handleAnswerSelect(option)}
                                                     className={cn(
                                                         "w-full text-left p-5 rounded-2xl border transition-all relative flex items-center justify-between group",
-                                                        !isAnswerSubmitted && isSelected && "bg-indigo-500/20 border-indigo-500/50 text-indigo-100",
+                                                        !isAnswerSubmitted && isSelected && "bg-[#2AB7CA]/20 border-[#2AB7CA]/50 text-indigo-100",
                                                         !isAnswerSubmitted && !isSelected && "bg-white/5 border-white/5 text-slate-300 hover:bg-white/10",
-                                                        isAnswerSubmitted && isCorrect && "bg-emerald-500/20 border-emerald-500/50 text-emerald-100",
+                                                        isAnswerSubmitted && isCorrect && "bg-[#FED766]/20 border-[#FED766]/50 text-emerald-100",
                                                         isAnswerSubmitted && isSelected && !isCorrect && "bg-rose-500/20 border-rose-500/50 text-rose-100",
                                                         isAnswerSubmitted && !isCorrect && !isSelected && "opacity-40 bg-white/5 border-white/5"
                                                     )}
                                                 >
                                                     <span className="font-medium">{option}</span>
-                                                    {isAnswerSubmitted && isCorrect && <CheckCircle2 size={20} className="text-emerald-400" />}
+                                                    {isAnswerSubmitted && isCorrect && <CheckCircle2 size={20} className="text-[#FED766]" />}
                                                     {isAnswerSubmitted && isSelected && !isCorrect && <AlertCircle size={20} className="text-rose-400" />}
                                                 </button>
                                             );
@@ -225,7 +225,7 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                                             <button
                                                 disabled={!selectedAnswer}
                                                 onClick={handleSubmitAnswer}
-                                                className="w-full bg-indigo-500 text-white font-bold py-4 rounded-xl hover:bg-indigo-600 disabled:opacity-50 transition-all"
+                                                className="w-full bg-[#2AB7CA] text-white font-bold py-4 rounded-xl hover:bg-indigo-600 disabled:opacity-50 transition-all"
                                             >
                                                 Check Answer
                                             </button>
@@ -250,10 +250,10 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                                     className="text-center space-y-8 py-4"
                                 >
                                     <div className="relative inline-block">
-                                        <div className="w-32 h-32 bg-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 mx-auto">
+                                        <div className="w-32 h-32 bg-[#2AB7CA]/20 rounded-full flex items-center justify-center text-[#2AB7CA] mx-auto">
                                             <Trophy size={48} />
                                         </div>
-                                        <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 border-black">
+                                        <div className="absolute -bottom-2 -right-2 bg-[#FED766] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 border-black">
                                             {score}
                                         </div>
                                     </div>
@@ -286,8 +286,8 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                                                 onClose();
                                             }}
                                             className={cn(
-                                                "font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/20",
-                                                score >= 4 ? "bg-emerald-500 hover:bg-emerald-600 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
+                                                "font-bold py-4 rounded-2xl transition-all shadow-lg shadow-[#2AB7CA]/20",
+                                                score >= 4 ? "bg-[#FED766] hover:bg-emerald-600 text-white" : "bg-white/10 text-slate-500 cursor-not-allowed"
                                             )}
                                         >
                                             {score >= 4 ? 'Continue' : 'Locked'}

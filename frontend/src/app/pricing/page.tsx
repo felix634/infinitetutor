@@ -46,7 +46,7 @@ const plans = [
         ],
         cta: 'Start Pro Trial',
         popular: true,
-        gradient: 'from-indigo-500 to-emerald-500'
+        gradient: 'from-[#2AB7CA] to-[#FED766]'
     }
 ];
 
@@ -78,26 +78,26 @@ export default function PricingPage() {
     const savings = plans[1].monthlyPrice * 12 - plans[1].yearlyPrice;
 
     return (
-        <div className="min-h-screen bg-[#020617] text-slate-50">
+        <div className="min-h-screen bg-[#0B0C10] text-slate-50">
             <Header />
 
             {/* Hero Section */}
             <section className="pt-32 pb-16 px-6 relative overflow-hidden">
-                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-[150px]" />
-                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-[150px]" />
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#2AB7CA]/20 rounded-full blur-[150px]" />
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FED766]/20 rounded-full blur-[150px]" />
 
                 <div className="max-w-4xl mx-auto text-center relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FED766]/10 border border-[#FED766]/20 text-[#FED766] text-sm font-medium mb-8">
                             <Crown size={14} />
                             <span>Simple, Transparent Pricing</span>
                         </div>
 
                         <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
-                            Invest in Your <span className="bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">Growth</span>
+                            Invest in Your <span className="bg-gradient-to-r from-[#2AB7CA] to-[#FED766] bg-clip-text text-transparent">Growth</span>
                         </h1>
 
                         <p className="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
@@ -122,7 +122,7 @@ export default function PricingPage() {
                                 className={cn(
                                     "px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2",
                                     billingCycle === 'yearly'
-                                        ? "bg-gradient-to-r from-indigo-500 to-emerald-500 text-white"
+                                        ? "bg-gradient-to-r from-[#2AB7CA] to-[#FED766] text-white"
                                         : "text-slate-400 hover:text-white"
                                 )}
                             >
@@ -149,13 +149,13 @@ export default function PricingPage() {
                                 className={cn(
                                     "relative glass-dark rounded-[2.5rem] p-8 md:p-10",
                                     plan.popular
-                                        ? "border-2 border-indigo-500/50"
+                                        ? "border-2 border-[#2AB7CA]/50"
                                         : "border border-white/5"
                                 )}
                             >
                                 {plan.popular && (
                                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                                        <div className="bg-gradient-to-r from-indigo-500 to-emerald-500 text-white text-sm font-bold px-4 py-1.5 rounded-full flex items-center gap-2">
+                                        <div className="bg-gradient-to-r from-[#2AB7CA] to-[#FED766] text-white text-sm font-bold px-4 py-1.5 rounded-full flex items-center gap-2">
                                             <Star size={14} fill="white" />
                                             Most Popular
                                         </div>
@@ -177,7 +177,7 @@ export default function PricingPage() {
                                         </span>
                                     </div>
                                     {billingCycle === 'yearly' && plan.yearlyPrice > 0 && (
-                                        <p className="text-sm text-emerald-400 mt-2">
+                                        <p className="text-sm text-[#FED766] mt-2">
                                             That's just ${Math.round(plan.yearlyPrice / 12)}/month
                                         </p>
                                     )}
@@ -188,7 +188,7 @@ export default function PricingPage() {
                                         <li key={i} className="flex items-center gap-3">
                                             <div className={cn(
                                                 "w-5 h-5 rounded-full flex items-center justify-center",
-                                                plan.popular ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white"
+                                                plan.popular ? "bg-[#FED766]/20 text-[#FED766]" : "bg-white/10 text-white"
                                             )}>
                                                 <Check size={12} />
                                             </div>
@@ -202,7 +202,7 @@ export default function PricingPage() {
                                     className={cn(
                                         "w-full font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2",
                                         plan.popular
-                                            ? "bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-600 hover:to-emerald-600 text-white shadow-xl shadow-indigo-500/20"
+                                            ? "bg-gradient-to-r from-[#2AB7CA] to-[#FED766] hover:from-[#2AB7CA] hover:to-emerald-600 text-white shadow-xl shadow-[#2AB7CA]/20"
                                             : "bg-white/5 hover:bg-white/10 border border-white/10 text-white"
                                     )}
                                 >
@@ -244,7 +244,7 @@ export default function PricingPage() {
                                 transition={{ delay: index * 0.05 }}
                                 className="glass-dark border border-white/5 rounded-2xl p-6 text-left"
                             >
-                                <item.icon className="text-indigo-400 mb-4" size={24} />
+                                <item.icon className="text-[#2AB7CA] mb-4" size={24} />
                                 <h3 className="font-bold mb-1">{item.title}</h3>
                                 <p className="text-sm text-slate-400">{item.desc}</p>
                             </motion.div>
@@ -278,7 +278,7 @@ export default function PricingPage() {
                             >
                                 <p className="text-slate-300 mb-6 leading-relaxed">"{testimonial.quote}"</p>
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-emerald-500 flex items-center justify-center font-bold text-white">
+                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2AB7CA] to-[#FED766] flex items-center justify-center font-bold text-white">
                                         {testimonial.avatar}
                                     </div>
                                     <div>
@@ -299,9 +299,9 @@ export default function PricingPage() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="glass-dark border border-emerald-500/20 rounded-[2.5rem] p-12 relative overflow-hidden"
+                        className="glass-dark border border-[#FED766]/20 rounded-[2.5rem] p-12 relative overflow-hidden"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-emerald-500/10" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#2AB7CA]/10 to-[#FED766]/10" />
 
                         <div className="relative z-10">
                             <h2 className="text-3xl font-black mb-4">Start Learning Today</h2>
@@ -310,7 +310,7 @@ export default function PricingPage() {
                             </p>
                             <button
                                 onClick={() => router.push('/login')}
-                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-600 hover:to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-indigo-500/20"
+                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#2AB7CA] to-[#FED766] hover:from-[#2AB7CA] hover:to-emerald-600 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-[#2AB7CA]/20"
                             >
                                 Start Free Trial
                                 <ArrowRight size={18} />

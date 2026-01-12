@@ -103,7 +103,7 @@ export default function CourseDashboard() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-black text-white">
                 <div className="animate-pulse flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-[#2AB7CA] border-t-transparent rounded-full animate-spin" />
                     <p className="text-muted-foreground">Loading your curriculum...</p>
                 </div>
             </div>
@@ -111,7 +111,7 @@ export default function CourseDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-[#020617] text-slate-50 selection:bg-indigo-500/30">
+        <div className="min-h-screen bg-[#0B0C10] text-slate-50 selection:bg-[#2AB7CA]/30">
             <Header />
 
             <main className="pt-32 pb-24 px-6 max-w-5xl mx-auto">
@@ -127,11 +127,11 @@ export default function CourseDashboard() {
                         </h1>
                         <div className="flex flex-wrap gap-6 text-slate-400 text-sm font-medium">
                             <div className="flex items-center gap-2">
-                                <Layout size={16} className="text-indigo-400" />
+                                <Layout size={16} className="text-[#2AB7CA]" />
                                 {course.chapters.length} Chapters
                             </div>
                             <div className="flex items-center gap-2">
-                                <BookOpen size={16} className="text-emerald-400" />
+                                <BookOpen size={16} className="text-[#FED766]" />
                                 {course.chapters.reduce((acc, c) => acc + c.lessons.length, 0)} Lessons
                             </div>
                             <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export default function CourseDashboard() {
                                 className="group"
                             >
                                 <div className="flex items-center gap-4 mb-6">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-800 border border-white/10 flex items-center justify-center font-bold text-slate-400 group-hover:border-indigo-500/50 transition-colors">
+                                    <div className="w-10 h-10 rounded-xl bg-slate-800 border border-white/10 flex items-center justify-center font-bold text-slate-400 group-hover:border-[#2AB7CA]/50 transition-colors">
                                         {chapterIdx + 1}
                                     </div>
                                     <h2 className="text-2xl font-bold tracking-tight">{chapter.title}</h2>
@@ -187,8 +187,8 @@ export default function CourseDashboard() {
                                                 <div className="flex items-center gap-4">
                                                     <div className={cn(
                                                         "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
-                                                        isCompleted ? "bg-emerald-500/20 text-emerald-400" :
-                                                            isUnlocked ? "bg-slate-800 text-slate-500 group-hover/lesson:bg-indigo-500/20 group-hover/lesson:text-indigo-400" :
+                                                        isCompleted ? "bg-[#FED766]/20 text-[#FED766]" :
+                                                            isUnlocked ? "bg-slate-800 text-slate-500 group-hover/lesson:bg-[#2AB7CA]/20 group-hover/lesson:text-[#2AB7CA]" :
                                                                 "bg-slate-900 text-slate-700"
                                                     )}>
                                                         {isCompleted ? <CheckCircle2 size={20} /> : isUnlocked ? <PlayCircle size={20} /> : <Lock size={18} />}
@@ -206,7 +206,7 @@ export default function CourseDashboard() {
 
                                                 <div className="flex items-center gap-2">
                                                     {isUnlocked ? (
-                                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 group-hover/lesson:bg-indigo-500 text-slate-400 group-hover/lesson:text-white border border-white/10 transition-all">
+                                                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 group-hover/lesson:bg-[#2AB7CA] text-slate-400 group-hover/lesson:text-white border border-white/10 transition-all">
                                                             <span className="text-xs font-bold uppercase tracking-wider">
                                                                 {isCompleted ? 'Review' : 'Start'}
                                                             </span>
@@ -226,15 +226,15 @@ export default function CourseDashboard() {
 
                     {/* Sidebar */}
                     <div className="space-y-8">
-                        <div className="glass-dark border border-indigo-500/20 rounded-3xl p-8 space-y-6">
+                        <div className="glass-dark border border-[#2AB7CA]/20 rounded-3xl p-8 space-y-6">
                             <div className="flex items-center gap-3 mb-2">
-                                <Award size={24} className="text-indigo-400" />
+                                <Award size={24} className="text-[#2AB7CA]" />
                                 <h3 className="font-bold text-xl">Learning Progress</h3>
                             </div>
                             <div className="space-y-4">
                                 <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-indigo-500 transition-all duration-1000"
+                                        className="h-full bg-[#2AB7CA] transition-all duration-1000"
                                         style={{ width: `${progressPercent}%` }}
                                     />
                                 </div>
@@ -257,7 +257,7 @@ export default function CourseDashboard() {
                                     // If all complete, just go to first
                                     router.push(`/course/${course.course_id}/lesson/${encodeURIComponent(course.chapters[0].lessons[0])}`);
                                 }}
-                                className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 mt-4"
+                                className="w-full bg-[#2AB7CA] hover:bg-indigo-600 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-[#2AB7CA]/20 mt-4"
                             >
                                 {completedLessons === 0 ? 'Start Learning' : 'Resume Lab'}
                             </button>

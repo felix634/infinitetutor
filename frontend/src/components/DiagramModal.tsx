@@ -70,7 +70,7 @@ export default function DiagramModal({ isOpen, onClose, lessonTitle, topic, leve
             >
                 <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
                     <div className="flex items-center gap-4">
-                        <div className="p-2 bg-emerald-500/20 rounded-xl text-emerald-400">
+                        <div className="p-2 bg-[#FED766]/20 rounded-xl text-[#FED766]">
                             <Zap size={24} />
                         </div>
                         <div>
@@ -89,7 +89,7 @@ export default function DiagramModal({ isOpen, onClose, lessonTitle, topic, leve
                 <div className="p-8 max-h-[70vh] overflow-y-auto">
                     {loading ? (
                         <div className="py-24 flex flex-col items-center justify-center gap-6">
-                            <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                            <div className="w-12 h-12 border-4 border-[#FED766] border-t-transparent rounded-full animate-spin" />
                             <p className="text-slate-400 font-medium">Generating visual mental model...</p>
                         </div>
                     ) : (
@@ -103,8 +103,8 @@ export default function DiagramModal({ isOpen, onClose, lessonTitle, topic, leve
                                     >
                                         <MermaidRenderer chart={data.mermaid_code} />
 
-                                        <div className="flex gap-4 p-6 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl">
-                                            <Info className="text-indigo-400 shrink-0" size={20} />
+                                        <div className="flex gap-4 p-6 bg-[#2AB7CA]/5 border border-[#2AB7CA]/10 rounded-2xl">
+                                            <Info className="text-[#2AB7CA] shrink-0" size={20} />
                                             <p className="text-slate-300 leading-relaxed text-sm">
                                                 {data.explanation}
                                             </p>
@@ -123,7 +123,7 @@ export default function DiagramModal({ isOpen, onClose, lessonTitle, topic, leve
                     </button>
                     <button
                         onClick={onClose}
-                        className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20"
+                        className="flex-1 bg-[#2AB7CA] hover:bg-indigo-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-[#2AB7CA]/20"
                     >
                         Got it, thanks!
                     </button>
