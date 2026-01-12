@@ -22,7 +22,9 @@ from services.auth_service import (
     get_user_by_token,
     logout_user,
     save_user_course,
-    get_user_courses
+    get_user_courses,
+    get_cached_lesson,
+    save_cached_lesson
 )
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -202,7 +204,35 @@ async def generate_diagram(request: DiagramRequest):
 @app.post("/generate-lesson", response_model=LessonContentResponse)
 async def generate_lesson(request: LessonContentRequest):
     try:
+        # Check cache first if course_id is provided
+        if request.course_id:
+            cached = get_cached_lesson(request.course_id, request.lesson_title)
+            if cached:
+                print(f"✅ Returning cached lesson: {request.lesson_title}")
+                return LessonContentResponse(
+                    lesson_title=cached["lesson_title"],
+                    content_markdown=cached["content_markdown"],
+                    mermaid_code=cached.get("mermaid_code", ""),
+                    image_prompt="",
+                    summary=""
+                )
+        
+        # Generate new lesson
         lesson_data = generate_lesson_content(request)
+        
+        # Cache the lesson if course_id is provided
+        if request.course_id:
+            save_cached_lesson(
+                course_id=request.course_id,
+                lesson_title=request.lesson_title,
+                topic=request.topic,
+                level=request.level,
+                content_markdown=lesson_data.get("content_markdown", ""),
+                mermaid_code=lesson_data.get("mermaid_code", ""),
+                explanation=lesson_data.get("summary", "")
+            )
+            print(f"💾 Cached new lesson: {request.lesson_title}")
+        
         return lesson_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -5,6 +5,7 @@ class LessonContentRequest(BaseModel):
     lesson_title: str
     topic: str
     level: str
+    course_id: Optional[str] = None  # For caching lessons
 
 class LessonContentResponse(BaseModel):
     lesson_title: str

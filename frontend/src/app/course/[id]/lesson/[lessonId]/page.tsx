@@ -33,10 +33,10 @@ export default function LessonPage() {
             const course = JSON.parse(savedCourse);
             setCourseTitle(course.title);
 
-            // In a real app, we'd fetch by ID. Here we use the title from the URL or query.
-            // For now, let's assume the lessonTitle is passed via query or we find it in the syllabus.
+            // Pass course_id for caching
             const urlLessonTitle = decodeURIComponent(params.lessonId as string);
-            fetchLessonContent(urlLessonTitle, course.title);
+            const courseId = course.course_id || params.id;
+            fetchLessonContent(urlLessonTitle, course.title, courseId as string);
 
             // Check if already passed
             const progress = JSON.parse(localStorage.getItem('course_progress') || '{}');
@@ -47,13 +47,18 @@ export default function LessonPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.lessonId]);
 
-    const fetchLessonContent = async (title: string, topic: string) => {
+    const fetchLessonContent = async (title: string, topic: string, courseId: string) => {
         setLoading(true);
         try {
             const response = await fetch(api.generateLesson, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ lesson_title: title, topic, level: 'Intermediate' }),
+                body: JSON.stringify({
+                    lesson_title: title,
+                    topic,
+                    level: 'Intermediate',
+                    course_id: courseId  // Include course_id for caching
+                }),
             });
             const data = await response.json();
             setContent(data);

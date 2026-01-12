@@ -72,6 +72,22 @@ def init_db():
             )
         ''')
         
+        # Cached lessons table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS lessons (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                course_id TEXT NOT NULL,
+                lesson_title TEXT NOT NULL,
+                topic TEXT NOT NULL,
+                level TEXT NOT NULL,
+                content_markdown TEXT NOT NULL,
+                mermaid_code TEXT,
+                explanation TEXT,
+                created_at TEXT NOT NULL,
+                UNIQUE(course_id, lesson_title)
+            )
+        ''')
+        
         conn.commit()
 
 # Initialize database on import
@@ -330,3 +346,37 @@ def update_course_progress(email: str, course_id: str, progress_percent: int) ->
         ''', (progress_percent, datetime.now().isoformat(), email, course_id))
         conn.commit()
         return cursor.rowcount > 0
+
+def get_cached_lesson(course_id: str, lesson_title: str) -> Optional[dict]:
+    """Get a cached lesson if it exists."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT lesson_title, content_markdown, mermaid_code, explanation
+            FROM lessons 
+            WHERE course_id = ? AND lesson_title = ?
+        ''', (course_id, lesson_title))
+        
+        row = cursor.fetchone()
+        if row:
+            return {
+                "lesson_title": row['lesson_title'],
+                "content_markdown": row['content_markdown'],
+                "mermaid_code": row['mermaid_code'],
+                "explanation": row['explanation']
+            }
+        return None
+
+def save_cached_lesson(course_id: str, lesson_title: str, topic: str, level: str, 
+                       content_markdown: str, mermaid_code: str = "", explanation: str = "") -> bool:
+    """Save a generated lesson to cache."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT OR REPLACE INTO lessons 
+            (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, 
+              datetime.now().isoformat()))
+        conn.commit()
+        return True
