@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
+import { api } from '@/lib/api';
 
 interface Course {
     course_id: string;
@@ -128,7 +129,7 @@ export default function DashboardPage() {
 
     const fetchCourses = async (token: string) => {
         try {
-            const response = await fetch('http://localhost:8000/user/courses', {
+            const response = await fetch(api.courses, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -144,7 +145,7 @@ export default function DashboardPage() {
     const fetchSuggestions = async (token: string) => {
         setLoadingSuggestions(true);
         try {
-            const response = await fetch('http://localhost:8000/user/suggestions', {
+            const response = await fetch(api.suggestions, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -162,7 +163,7 @@ export default function DashboardPage() {
     const handleLogout = async () => {
         const token = localStorage.getItem('auth_token');
         if (token) {
-            await fetch('http://localhost:8000/auth/logout', {
+            await fetch(api.logout, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
             });

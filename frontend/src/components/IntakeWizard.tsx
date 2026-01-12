@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Sparkles, Brain, Clock, Target } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { api } from '@/lib/api';
 
 type Step = 'topic' | 'level' | 'time';
 
@@ -44,7 +45,7 @@ export default function IntakeWizard() {
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:8000/generate-syllabus', {
+            const response = await fetch(api.generateSyllabus, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
@@ -63,7 +64,7 @@ export default function IntakeWizard() {
             const token = localStorage.getItem('auth_token');
             if (token) {
                 try {
-                    await fetch('http://localhost:8000/user/save-course', {
+                    await fetch(api.saveCourse, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

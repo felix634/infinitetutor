@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, ArrowRight, Loader2, Sparkles, CheckCircle2, KeyRound, Lock, Eye, EyeOff } from 'lucide-react';
+import { api } from '@/lib/api';
 
 type Step = 'auth' | 'verify';
 type Mode = 'login' | 'register';
@@ -28,7 +29,7 @@ export default function LoginPage() {
         try {
             if (mode === 'login') {
                 // Direct login
-                const response = await fetch('http://localhost:8000/auth/login', {
+                const response = await fetch(api.login, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password }),
@@ -45,7 +46,7 @@ export default function LoginPage() {
                 router.push('/dashboard');
             } else {
                 // Register - send verification code
-                const response = await fetch('http://localhost:8000/auth/register', {
+                const response = await fetch(api.register, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password }),
@@ -73,7 +74,7 @@ export default function LoginPage() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/auth/verify', {
+            const response = await fetch(api.verify, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, code }),

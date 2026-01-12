@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Sparkles, User, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { api } from '@/lib/api';
 
 export default function Header() {
     const router = useRouter();
@@ -33,7 +34,7 @@ export default function Header() {
     const handleLogout = async () => {
         const token = localStorage.getItem('auth_token');
         if (token) {
-            await fetch('http://localhost:8000/auth/logout', {
+            await fetch(api.logout, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
             });

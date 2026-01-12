@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import { cn } from '@/lib/utils';
+import { api } from '@/lib/api';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -70,7 +71,7 @@ export default function SettingsPage() {
     const handleLogout = async () => {
         const token = localStorage.getItem('auth_token');
         if (token) {
-            await fetch('http://localhost:8000/auth/logout', {
+            await fetch(api.logout, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
             });

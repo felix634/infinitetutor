@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
+import { api } from '@/lib/api';
 
 interface Lesson {
     title: string;
@@ -65,7 +66,7 @@ export default function CourseDashboard() {
         const token = localStorage.getItem('auth_token');
         if (token) {
             try {
-                const response = await fetch(`http://localhost:8000/user/course/${params.id}`, {
+                const response = await fetch(api.course(params.id as string), {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

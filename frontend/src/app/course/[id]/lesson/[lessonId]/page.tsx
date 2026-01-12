@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import MermaidRenderer from '@/components/MermaidRenderer';
 import QuizModal from '@/components/QuizModal';
 import Header from '@/components/Header';
+import { api } from '@/lib/api';
 
 interface LessonContent {
     lesson_title: string;
@@ -49,7 +50,7 @@ export default function LessonPage() {
     const fetchLessonContent = async (title: string, topic: string) => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:8000/generate-lesson', {
+            const response = await fetch(api.generateLesson, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ lesson_title: title, topic, level: 'Intermediate' }),
