@@ -52,21 +52,21 @@ export default function Header() {
     ];
 
     return (
-        <header className="fixed top-0 w-full z-50 glass-dark border-b border-white/5 px-6 py-4">
+        <header className="fixed top-0 w-full z-50 glass-dark border-b border-white/5 px-4 md:px-6 py-3 md:py-4 safe-area-top">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
                 {/* Logo */}
                 <button
                     onClick={() => router.push('/')}
-                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity"
                 >
                     <Image
                         src="/logo.png"
                         alt="InfiniteTutor"
                         width={40}
                         height={40}
-                        className="w-10 h-10 object-contain"
+                        className="w-8 h-8 md:w-10 md:h-10 object-contain"
                     />
-                    <span className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#2AB7CA] to-[#FED766]">InfiniteTutor</span>
+                    <span className="text-lg md:text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#2AB7CA] to-[#FED766]">InfiniteTutor</span>
                 </button>
 
                 {/* Navigation */}

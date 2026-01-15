@@ -11,24 +11,24 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative pt-48 pb-32 px-6 overflow-hidden">
-        {/* Background blobs for depth - New brand colors */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#2AB7CA]/10 rounded-full blur-[100px] -z-10 animate-pulse" />
-        <div className="absolute top-1/2 -right-20 w-96 h-96 bg-[#FED766]/10 rounded-full blur-[100px] -z-10 animate-pulse" />
-        <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-[#2AB7CA]/5 rounded-full blur-[80px] -z-10" />
+      <section className="relative pt-28 md:pt-48 pb-16 md:pb-32 px-4 md:px-6 overflow-hidden">
+        {/* Background blobs for depth - New brand colors - hidden on mobile */}
+        <div className="hidden md:block absolute top-1/4 -left-20 w-96 h-96 bg-[#2AB7CA]/10 rounded-full blur-[100px] -z-10 animate-pulse" />
+        <div className="hidden md:block absolute top-1/2 -right-20 w-96 h-96 bg-[#FED766]/10 rounded-full blur-[100px] -z-10 animate-pulse" />
+        <div className="hidden md:block absolute bottom-1/4 left-1/2 w-64 h-64 bg-[#2AB7CA]/5 rounded-full blur-[80px] -z-10" />
 
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
           {/* Hero Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 text-[#2AB7CA] text-sm font-medium mb-12">
+          <div className="inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-full bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 text-[#2AB7CA] text-xs md:text-sm font-medium mb-6 md:mb-12">
             <Sparkles size={14} className="animate-pulse" />
             <span>AI-Powered Personal Mastery</span>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.9] max-w-4xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter mb-6 md:mb-8 leading-[0.95] max-w-4xl px-2">
             The <span className="gradient-text">Infinite</span> Way To Master Anything
           </h1>
 
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mb-20 leading-relaxed font-light">
+          <p className="text-base md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mb-12 md:mb-20 leading-relaxed font-light px-2">
             Stop scrolling generic tutorials. Generate a bespoke, interactive curriculum
             tailored to your level, schedule, and goals—instantly.
           </p>

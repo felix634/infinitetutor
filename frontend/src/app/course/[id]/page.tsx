@@ -114,15 +114,15 @@ export default function CourseDashboard() {
         <div className="min-h-screen bg-[#0B0C10] text-slate-50 selection:bg-[#2AB7CA]/30">
             <Header />
 
-            <main className="pt-32 pb-24 px-6 max-w-5xl mx-auto">
+            <main className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-6 max-w-5xl mx-auto">
                 {/* Hero Section */}
-                <section className="mb-20">
+                <section className="mb-12 md:mb-20">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="space-y-4"
                     >
-                        <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[0.9]">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black tracking-tight leading-tight">
                             {course.title}
                         </h1>
                         <div className="flex flex-wrap gap-6 text-slate-400 text-sm font-medium">

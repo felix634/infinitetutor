@@ -90,4 +90,13 @@
   .gold-glow {
     box-shadow: 0 0 20px rgba(254, 215, 102, 0.4), 0 0 40px rgba(254, 215, 102, 0.2);
   }
+
+  /* Safe area utilities for iOS notch/home indicator */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }

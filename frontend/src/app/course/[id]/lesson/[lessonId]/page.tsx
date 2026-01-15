@@ -94,9 +94,9 @@ export default function LessonPage() {
         <div className="min-h-screen bg-[#0B0C10] text-slate-50">
             <Header />
 
-            <main className="pt-32 pb-24 px-6 max-w-4xl mx-auto space-y-16">
+            <main className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-6 max-w-4xl mx-auto space-y-10 md:space-y-16">
                 {/* Hero Section */}
-                <section className="space-y-6">
+                <section className="space-y-4 md:space-y-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -105,10 +105,10 @@ export default function LessonPage() {
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 text-[#2AB7CA] text-xs font-bold uppercase tracking-tighter">
                             Lesson Content
                         </div>
-                        <h1 className="text-5xl font-black tracking-tight leading-tight">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
                             {content.lesson_title}
                         </h1>
-                        <p className="text-xl text-slate-400 max-w-2xl leading-relaxed">
+                        <p className="text-base md:text-xl text-slate-400 max-w-2xl leading-relaxed">
                             {content.summary}
                         </p>
                     </motion.div>
@@ -116,8 +116,8 @@ export default function LessonPage() {
 
                 {/* Main Content */}
                 <section className="prose prose-invert prose-indigo max-w-none">
-                    <div className="glass-dark border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl space-y-8">
-                        <div className="text-slate-300 text-lg leading-relaxed space-y-6 markdown-content">
+                    <div className="glass-dark border border-white/5 rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 lg:p-12 shadow-2xl space-y-6 md:space-y-8">
+                        <div className="text-slate-300 text-base md:text-lg leading-relaxed space-y-6 markdown-content">
                             <ReactMarkdown>
                                 {content.content_markdown}
                             </ReactMarkdown>
