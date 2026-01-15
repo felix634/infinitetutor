@@ -64,7 +64,8 @@ export default function IntakeWizard() {
             const token = localStorage.getItem('auth_token');
             if (token) {
                 try {
-                    await fetch(api.saveCourse, {
+                    console.log('Saving course to profile with token:', token.substring(0, 10) + '...');
+                    const saveResponse = await fetch(api.saveCourse, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -79,9 +80,18 @@ export default function IntakeWizard() {
                             chapters: data.chapters || []
                         }),
                     });
+
+                    if (saveResponse.ok) {
+                        console.log('✅ Course saved to profile successfully');
+                    } else {
+                        const errorData = await saveResponse.text();
+                        console.error('❌ Failed to save course:', saveResponse.status, errorData);
+                    }
                 } catch (err) {
-                    console.log('Could not save to profile (user may not be logged in)');
+                    console.error('❌ Error saving course to profile:', err);
                 }
+            } else {
+                console.log('No auth token found - course saved to localStorage only');
             }
 
             // Navigate to the dashboard
