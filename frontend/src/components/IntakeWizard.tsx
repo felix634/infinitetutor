@@ -6,6 +6,7 @@ import { ChevronRight, ChevronLeft, Sparkles, Brain, Clock, Target } from 'lucid
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 type Step = 'topic' | 'level' | 'time';
 
@@ -61,15 +62,15 @@ export default function IntakeWizard() {
             }));
 
             // If user is logged in, save course to their profile
-            const token = localStorage.getItem('auth_token');
-            if (token) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
                 try {
-                    console.log('Saving course to profile with token:', token.substring(0, 10) + '...');
+                    console.log('Saving course to profile with Supabase token');
                     const saveResponse = await fetch(api.saveCourse, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${session.access_token}`
                         },
                         body: JSON.stringify({
                             course_id: data.course_id,
@@ -91,7 +92,7 @@ export default function IntakeWizard() {
                     console.error('❌ Error saving course to profile:', err);
                 }
             } else {
-                console.log('No auth token found - course saved to localStorage only');
+                console.log('No Supabase session - course saved to localStorage only');
             }
 
             // Navigate to the dashboard
