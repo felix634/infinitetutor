@@ -72,10 +72,24 @@ export default function MermaidRenderer({ chart }: MermaidRendererProps) {
                     cleanChart = cleanChart.replace(/^```mermaid\s*/i, '').replace(/```\s*$/i, '');
                     cleanChart = cleanChart.replace(/^```\s*/i, '').replace(/```\s*$/i, '');
 
-                    // Fix common issues with node labels
-                    // Replace problematic characters in labels
-                    cleanChart = cleanChart.replace(/\[([^\]]*['"<>][^\]]*)\]/g, (match, content) => {
-                        return `["${content.replace(/["'<>]/g, '')}"]`;
+                    // Fix problematic node definitions with parentheses in the label
+                    // Convert A[Label (with parens)] to A["Label with parens"]
+                    // Convert B(Label with parens) to B["Label with parens"]
+                    cleanChart = cleanChart.replace(/(\w+)\[([^\]]*\([^)]*\)[^\]]*)\]/g, (match, nodeId, content) => {
+                        const cleanContent = content.replace(/[()]/g, '').replace(/"/g, "'");
+                        return `${nodeId}["${cleanContent}"]`;
+                    });
+
+                    // Fix curly brace nodes with parens: C{Label (1990)} -> C{"Label 1990"}
+                    cleanChart = cleanChart.replace(/(\w+)\{([^}]*\([^)]*\)[^}]*)\}/g, (match, nodeId, content) => {
+                        const cleanContent = content.replace(/[()]/g, '').replace(/"/g, "'");
+                        return `${nodeId}{"${cleanContent}"}`;
+                    });
+
+                    // Fix stadium nodes with nested parens: D(Label (text)) -> D["Label text"]
+                    cleanChart = cleanChart.replace(/(\w+)\(([^)]*\([^)]*\)[^)]*)\)/g, (match, nodeId, content) => {
+                        const cleanContent = content.replace(/[()]/g, '').replace(/"/g, "'");
+                        return `${nodeId}["${cleanContent}"]`;
                     });
 
                     // Ensure chart starts with a valid diagram type
