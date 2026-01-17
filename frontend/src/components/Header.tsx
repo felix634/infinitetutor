@@ -33,17 +33,30 @@ export default function Header() {
     }, []);
 
     const handleLogout = async () => {
-        const token = localStorage.getItem('auth_token');
-        if (token) {
-            await fetch(api.logout, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
-            });
+        try {
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                // Try to call logout API, but don't block on it
+                fetch(api.logout, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}` },
+                }).catch(() => {
+                    // Ignore errors - we're logging out anyway
+                });
+            }
+        } catch {
+            // Ignore any errors
         }
+
+        // Always clear local storage and redirect
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_email');
+        localStorage.removeItem('current_course');
         setIsLoggedIn(false);
-        router.push('/login');
+        setUserEmail('');
+
+        // Use window.location for a clean redirect that resets all state
+        window.location.href = '/login';
     };
 
     const navItems = [
