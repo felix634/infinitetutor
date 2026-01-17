@@ -10,37 +10,37 @@ mermaid.initialize({
     themeVariables: {
         // Background colors - using Void Black
         background: '#0B0C10',
-        primaryColor: '#1a1d24',
-        secondaryColor: '#252a33',
-        tertiaryColor: '#2f3542',
+        primaryColor: '#2AB7CA',
+        secondaryColor: '#FED766',
+        tertiaryColor: '#2AB7CA',
 
-        // Text colors - ensure white/light text everywhere
-        primaryTextColor: '#f1f5f9',
-        secondaryTextColor: '#e2e8f0',
-        tertiaryTextColor: '#cbd5e1',
+        // Text colors - dark text for colored backgrounds
+        primaryTextColor: '#0B0C10',
+        secondaryTextColor: '#0B0C10',
+        tertiaryTextColor: '#0B0C10',
         lineColor: '#2AB7CA',
 
-        // Node colors - Cyber Blue borders
+        // Node colors - Brand colors
         nodeBorder: '#2AB7CA',
-        clusterBkg: '#1a1d24',
+        clusterBkg: '#0B0C10',
         clusterBorder: '#2AB7CA',
 
         // Flowchart specific
-        nodeTextColor: '#f1f5f9',
-        mainBkg: '#1a1d24',
+        nodeTextColor: '#0B0C10',
+        mainBkg: '#2AB7CA',
 
         // Edge/Arrow colors
-        edgeLabelBackground: '#1a1d24',
+        edgeLabelBackground: '#0B0C10',
 
-        // Special node colors override
-        fillType0: '#1a1d24',
-        fillType1: '#1a2633',
-        fillType2: '#1a2a30',
-        fillType3: '#1a3328',
-        fillType4: '#251a33',
-        fillType5: '#331a28',
-        fillType6: '#1a2633',
-        fillType7: '#1a3030',
+        // Special node colors - alternate between Cyber Blue and Neural Gold
+        fillType0: '#2AB7CA',
+        fillType1: '#FED766',
+        fillType2: '#2AB7CA',
+        fillType3: '#FED766',
+        fillType4: '#2AB7CA',
+        fillType5: '#FED766',
+        fillType6: '#2AB7CA',
+        fillType7: '#FED766',
     },
     flowchart: {
         htmlLabels: true,
@@ -71,32 +71,41 @@ export default function MermaidRenderer({ chart }: MermaidRendererProps) {
                     // Render the chart
                     const { svg } = await mermaid.render(id, cleanChart);
 
-                    // Apply additional styling to ensure white text
+                    // Apply additional styling with brand colors
                     const styledSvg = svg.replace(
                         /<style>/,
                         `<style>
                             .node rect, .node circle, .node ellipse, .node polygon, .node path { 
-                                fill: #1a1d24 !important; 
-                                stroke: #2AB7CA !important; 
+                                fill: #2AB7CA !important; 
+                                stroke: #0B0C10 !important;
+                                stroke-width: 2px !important;
+                            }
+                            .node:nth-child(even) rect, .node:nth-child(even) circle, .node:nth-child(even) ellipse, .node:nth-child(even) polygon {
+                                fill: #FED766 !important;
                             }
                             .node .label, .nodeLabel, .node text, text.nodeLabel { 
-                                fill: #f1f5f9 !important; 
-                                color: #f1f5f9 !important;
+                                fill: #0B0C10 !important; 
+                                color: #0B0C10 !important;
+                                font-weight: 600 !important;
                             }
                             .edgeLabel, .edgeLabel text, .edgeLabel span {
-                                fill: #e2e8f0 !important;
-                                color: #e2e8f0 !important;
-                                background-color: #1a1d24 !important;
+                                fill: #f1f5f9 !important;
+                                color: #f1f5f9 !important;
+                                background-color: #0B0C10 !important;
                             }
                             .label text, text {
-                                fill: #f1f5f9 !important;
+                                fill: #0B0C10 !important;
                             }
                             .cluster rect {
-                                fill: #1a1d24 !important;
+                                fill: #0B0C10 !important;
                                 stroke: #2AB7CA !important;
+                            }
+                            .cluster .nodeLabel, .cluster text {
+                                fill: #f1f5f9 !important;
                             }
                             .flowchart-link {
                                 stroke: #2AB7CA !important;
+                                stroke-width: 2px !important;
                             }
                             marker path {
                                 fill: #2AB7CA !important;
