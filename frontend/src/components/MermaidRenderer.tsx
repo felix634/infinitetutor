@@ -59,16 +59,32 @@ interface MermaidRendererProps {
 export default function MermaidRenderer({ chart }: MermaidRendererProps) {
     const ref = useRef<HTMLDivElement>(null);
     const [svg, setSvg] = useState<string>('');
+    const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
         const renderChart = async () => {
             if (chart && ref.current) {
                 try {
-                    // Clean the chart code
+                    // Clean the chart code - fix common AI-generated issues
                     let cleanChart = chart.trim();
 
+                    // Remove markdown code fences if present
+                    cleanChart = cleanChart.replace(/^```mermaid\s*/i, '').replace(/```\s*$/i, '');
+                    cleanChart = cleanChart.replace(/^```\s*/i, '').replace(/```\s*$/i, '');
+
+                    // Fix common issues with node labels
+                    // Replace problematic characters in labels
+                    cleanChart = cleanChart.replace(/\[([^\]]*['"<>][^\]]*)\]/g, (match, content) => {
+                        return `["${content.replace(/["'<>]/g, '')}"]`;
+                    });
+
+                    // Ensure chart starts with a valid diagram type
+                    if (!cleanChart.match(/^(graph|flowchart|sequenceDiagram|classDiagram|stateDiagram|erDiagram|journey|gantt|pie|mindmap)/i)) {
+                        cleanChart = 'flowchart TD\n' + cleanChart;
+                    }
+
                     // Generate unique ID
-                    const id = `mermaid-${Date.now()}`;
+                    const id = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
                     // Render the chart
                     const { svg } = await mermaid.render(id, cleanChart);
@@ -125,15 +141,28 @@ export default function MermaidRenderer({ chart }: MermaidRendererProps) {
                     );
 
                     setSvg(styledSvg);
+                    setHasError(false);
                 } catch (error) {
-                    console.error('Mermaid render error:', error);
-                    setSvg(`<div class="text-rose-400 p-4">Failed to render diagram</div>`);
+                    console.error('Mermaid render error:', error, '\nChart:', chart);
+                    setHasError(true);
+                    setSvg('');
                 }
             }
         };
 
         renderChart();
     }, [chart]);
+
+    if (hasError) {
+        return (
+            <div className="w-full bg-slate-900/50 p-6 rounded-3xl border border-white/5">
+                <p className="text-amber-400 text-sm mb-3">⚠️ Diagram could not be rendered. Here&apos;s the concept:</p>
+                <pre className="text-slate-400 text-xs whitespace-pre-wrap font-mono bg-slate-800/50 p-4 rounded-xl overflow-auto">
+                    {chart}
+                </pre>
+            </div>
+        );
+    }
 
     return (
         <div
@@ -143,3 +172,4 @@ export default function MermaidRenderer({ chart }: MermaidRendererProps) {
         />
     );
 }
+
