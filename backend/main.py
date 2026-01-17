@@ -20,6 +20,7 @@ from services.auth_service import (
     verify_email,
     login_user,
     get_user_by_token,
+    get_user_from_supabase_token,
     logout_user,
     save_user_course,
     get_user_courses,
@@ -45,6 +46,22 @@ app.add_middleware(
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+def get_current_user(authorization: Optional[str]) -> Optional[dict]:
+    """Get current user from either Supabase JWT or legacy token."""
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    
+    token = authorization.split(" ")[1]
+    
+    # Try Supabase JWT first
+    user = get_user_from_supabase_token(token)
+    if user:
+        return user
+    
+    # Fall back to legacy token
+    user = get_user_by_token(token)
+    return user
 
 # ============ AUTH ENDPOINTS ============
 
@@ -105,39 +122,27 @@ class SaveCourseRequest(BaseModel):
 
 @app.post("/user/save-course")
 async def save_course(request: SaveCourseRequest, authorization: Optional[str] = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    token = authorization.split(" ")[1]
-    user = get_user_by_token(token)
+    user = get_current_user(authorization)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
+        raise HTTPException(status_code=401, detail="Not authenticated")
     
     save_user_course(user["email"], request.model_dump())
     return {"message": "Course saved successfully"}
 
 @app.get("/user/courses")
 async def get_courses(authorization: Optional[str] = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    token = authorization.split(" ")[1]
-    user = get_user_by_token(token)
+    user = get_current_user(authorization)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
+        raise HTTPException(status_code=401, detail="Not authenticated")
     
     courses = get_user_courses(user["email"])
     return {"courses": courses}
 
 @app.get("/user/course/{course_id}")
 async def get_course(course_id: str, authorization: Optional[str] = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    token = authorization.split(" ")[1]
-    user = get_user_by_token(token)
+    user = get_current_user(authorization)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
+        raise HTTPException(status_code=401, detail="Not authenticated")
     
     courses = get_user_courses(user["email"])
     course = next((c for c in courses if c.get("course_id") == course_id), None)
@@ -149,13 +154,9 @@ async def get_course(course_id: str, authorization: Optional[str] = Header(None)
 
 @app.get("/user/suggestions")
 async def get_suggestions(authorization: Optional[str] = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    token = authorization.split(" ")[1]
-    user = get_user_by_token(token)
+    user = get_current_user(authorization)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
+        raise HTTPException(status_code=401, detail="Not authenticated")
     
     courses = get_user_courses(user["email"])
     topics = [c.get("topic", c.get("title", "")) for c in courses]

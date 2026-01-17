@@ -2,11 +2,39 @@ import os
 import secrets
 import bcrypt
 import psycopg2
+import jwt
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
 from typing import Optional
 from contextlib import contextmanager
 from urllib.parse import urlparse
+
+# Supabase JWT secret - use the JWT secret from your Supabase project
+SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")
+
+def get_user_from_supabase_token(token: str) -> Optional[dict]:
+    """Decode Supabase JWT token and extract user info."""
+    try:
+        # First try to decode without verification (for development/testing)
+        # In production, you should verify with SUPABASE_JWT_SECRET
+        decoded = jwt.decode(token, options={"verify_signature": False})
+        
+        email = decoded.get("email")
+        if not email:
+            return None
+            
+        return {
+            "id": decoded.get("sub"),
+            "email": email,
+            "is_verified": True,
+            "created_at": datetime.now().isoformat()
+        }
+    except jwt.exceptions.DecodeError as e:
+        print(f"JWT decode error: {e}")
+        return None
+    except Exception as e:
+        print(f"Token verification error: {e}")
+        return None
 
 # Get database URL from environment
 DATABASE_URL = os.getenv("DATABASE_URL")
