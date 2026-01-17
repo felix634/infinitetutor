@@ -1,7 +1,6 @@
 import os
 import secrets
 import bcrypt
-import resend
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
@@ -188,10 +187,10 @@ def verify_password(password: str, password_hash: str) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
 
 def send_verification_email(email: str, code: str) -> bool:
-    """Send verification email using Resend."""
-    resend_api_key = os.getenv("RESEND_API_KEY")
+    """Send verification email using Brevo (Sendinblue)."""
+    brevo_api_key = os.getenv("BREVO_API_KEY")
     
-    if not resend_api_key:
+    if not brevo_api_key:
         print(f"\n{'='*50}")
         print(f"📧 VERIFICATION CODE FOR {email}")
         print(f"   Code: {code}")
@@ -199,30 +198,44 @@ def send_verification_email(email: str, code: str) -> bool:
         return True
     
     try:
-        resend.api_key = resend_api_key
-        from_email = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
+        import sib_api_v3_sdk
+        from sib_api_v3_sdk.rest import ApiException
         
-        params = {
-            "from": f"InfiniteTutor <{from_email}>",
-            "to": [email],
-            "subject": "Your InfiniteTutor verification code",
-            "html": f"""
-            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
-                <div style="text-align: center; margin-bottom: 40px;">
-                    <h1 style="color: #1e293b; font-size: 24px; margin: 0;">InfiniteTutor</h1>
-                </div>
-                <div style="background: #f8fafc; border-radius: 16px; padding: 32px; text-align: center;">
-                    <p style="color: #64748b; margin: 0 0 24px;">Your verification code is:</p>
-                    <div style="background: white; border: 2px dashed #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-                        <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #1e293b;">{code}</span>
-                    </div>
-                    <p style="color: #94a3b8; font-size: 14px; margin: 0;">This code expires in 10 minutes.</p>
-                </div>
+        # Configure Brevo API
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = brevo_api_key
+        
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+        
+        sender = {"name": "InfiniteTutor", "email": "noreply@infinitetutor.app"}
+        to = [{"email": email}]
+        subject = "Your InfiniteTutor verification code"
+        html_content = f"""
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 style="color: #2AB7CA; font-size: 28px; margin: 0;">InfiniteTutor</h1>
             </div>
-            """
-        }
+            <div style="background: #0B0C10; border-radius: 16px; padding: 32px; text-align: center; border: 1px solid #2AB7CA;">
+                <p style="color: #94a3b8; margin: 0 0 24px;">Your verification code is:</p>
+                <div style="background: #1a1d24; border: 2px solid #2AB7CA; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                    <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #FED766;">{code}</span>
+                </div>
+                <p style="color: #64748b; font-size: 14px; margin: 0;">This code expires in 10 minutes.</p>
+            </div>
+            <p style="color: #64748b; font-size: 12px; text-align: center; margin-top: 24px;">
+                If you didn't request this code, you can safely ignore this email.
+            </p>
+        </div>
+        """
         
-        resend.Emails.send(params)
+        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+            to=to,
+            sender=sender,
+            subject=subject,
+            html_content=html_content
+        )
+        
+        api_instance.send_transac_email(send_smtp_email)
         print(f"✅ Verification email sent to {email}")
         return True
         

@@ -4,5 +4,5 @@ pydantic[email]
 python-dotenv
 google-generativeai
 bcrypt
-resend
+sib-api-v3-sdk
 psycopg2-binary
