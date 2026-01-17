@@ -5,3 +5,4 @@ python-dotenv
 google-generativeai
 bcrypt
 resend
+psycopg2-binary

@@ -1,92 +1,167 @@
 import os
-import sqlite3
 import secrets
 import bcrypt
 import resend
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
-from typing import Optional, List
+from typing import Optional
 from contextlib import contextmanager
+from urllib.parse import urlparse
 
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'infinitetutor.db')
+# Get database URL from environment
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# Ensure data directory exists
-os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+# Fallback to SQLite for local development if no DATABASE_URL
+USE_POSTGRES = DATABASE_URL is not None and DATABASE_URL.startswith("postgresql")
+
+if not USE_POSTGRES:
+    import sqlite3
+    DATABASE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'infinitetutor.db')
+    os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
 
 @contextmanager
 def get_db():
     """Get database connection."""
-    conn = sqlite3.connect(DATABASE_PATH)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
+    if USE_POSTGRES:
+        conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+        try:
+            yield conn
+        finally:
+            conn.close()
+    else:
+        conn = sqlite3.connect(DATABASE_PATH)
+        conn.row_factory = sqlite3.Row
+        try:
+            yield conn
+        finally:
+            conn.close()
+
+def get_placeholder():
+    """Return the correct placeholder for the database type."""
+    return "%s" if USE_POSTGRES else "?"
 
 def init_db():
     """Initialize database tables."""
+    ph = get_placeholder()
+    
     with get_db() as conn:
         cursor = conn.cursor()
         
-        # Users table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id TEXT PRIMARY KEY,
-                email TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                is_verified INTEGER DEFAULT 0,
-                created_at TEXT NOT NULL
-            )
-        ''')
-        
-        # Verification codes table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS verification_codes (
-                email TEXT PRIMARY KEY,
-                code TEXT NOT NULL,
-                expires_at TEXT NOT NULL
-            )
-        ''')
-        
-        # Sessions table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS sessions (
-                token TEXT PRIMARY KEY,
-                email TEXT NOT NULL,
-                created_at TEXT NOT NULL
-            )
-        ''')
-        
-        # User courses table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS user_courses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_email TEXT NOT NULL,
-                course_id TEXT NOT NULL,
-                title TEXT NOT NULL,
-                topic TEXT,
-                level TEXT,
-                progress_percent INTEGER DEFAULT 0,
-                chapters_json TEXT,
-                last_accessed TEXT NOT NULL,
-                UNIQUE(user_email, course_id)
-            )
-        ''')
-        
-        # Cached lessons table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS lessons (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                course_id TEXT NOT NULL,
-                lesson_title TEXT NOT NULL,
-                topic TEXT NOT NULL,
-                level TEXT NOT NULL,
-                content_markdown TEXT NOT NULL,
-                mermaid_code TEXT,
-                explanation TEXT,
-                created_at TEXT NOT NULL,
-                UNIQUE(course_id, lesson_title)
-            )
-        ''')
+        if USE_POSTGRES:
+            # PostgreSQL syntax
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id TEXT PRIMARY KEY,
+                    email TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    is_verified INTEGER DEFAULT 0,
+                    created_at TEXT NOT NULL
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS verification_codes (
+                    email TEXT PRIMARY KEY,
+                    code TEXT NOT NULL,
+                    expires_at TEXT NOT NULL
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS sessions (
+                    token TEXT PRIMARY KEY,
+                    email TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_courses (
+                    id SERIAL PRIMARY KEY,
+                    user_email TEXT NOT NULL,
+                    course_id TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    topic TEXT,
+                    level TEXT,
+                    progress_percent INTEGER DEFAULT 0,
+                    chapters_json TEXT,
+                    last_accessed TEXT NOT NULL,
+                    UNIQUE(user_email, course_id)
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS lessons (
+                    id SERIAL PRIMARY KEY,
+                    course_id TEXT NOT NULL,
+                    lesson_title TEXT NOT NULL,
+                    topic TEXT NOT NULL,
+                    level TEXT NOT NULL,
+                    content_markdown TEXT NOT NULL,
+                    mermaid_code TEXT,
+                    explanation TEXT,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(course_id, lesson_title)
+                )
+            ''')
+        else:
+            # SQLite syntax
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id TEXT PRIMARY KEY,
+                    email TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    is_verified INTEGER DEFAULT 0,
+                    created_at TEXT NOT NULL
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS verification_codes (
+                    email TEXT PRIMARY KEY,
+                    code TEXT NOT NULL,
+                    expires_at TEXT NOT NULL
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS sessions (
+                    token TEXT PRIMARY KEY,
+                    email TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_courses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_email TEXT NOT NULL,
+                    course_id TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    topic TEXT,
+                    level TEXT,
+                    progress_percent INTEGER DEFAULT 0,
+                    chapters_json TEXT,
+                    last_accessed TEXT NOT NULL,
+                    UNIQUE(user_email, course_id)
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS lessons (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    course_id TEXT NOT NULL,
+                    lesson_title TEXT NOT NULL,
+                    topic TEXT NOT NULL,
+                    level TEXT NOT NULL,
+                    content_markdown TEXT NOT NULL,
+                    mermaid_code TEXT,
+                    explanation TEXT,
+                    created_at TEXT NOT NULL,
+                    UNIQUE(course_id, lesson_title)
+                )
+            ''')
         
         conn.commit()
 
@@ -161,11 +236,13 @@ def send_verification_email(email: str, code: str) -> bool:
 
 def register_user(email: str, password: str) -> tuple[bool, str]:
     """Register a new user (step 1: send verification code)."""
+    ph = get_placeholder()
+    
     with get_db() as conn:
         cursor = conn.cursor()
         
         # Check if user already exists and is verified
-        cursor.execute('SELECT is_verified FROM users WHERE email = ?', (email,))
+        cursor.execute(f'SELECT is_verified FROM users WHERE email = {ph}', (email,))
         existing = cursor.fetchone()
         
         if existing and existing['is_verified']:
@@ -180,10 +257,17 @@ def register_user(email: str, password: str) -> tuple[bool, str]:
     
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute('''
-            INSERT OR REPLACE INTO verification_codes (email, code, expires_at)
-            VALUES (?, ?, ?)
-        ''', (email, code, expires_at))
+        if USE_POSTGRES:
+            cursor.execute('''
+                INSERT INTO verification_codes (email, code, expires_at)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (email) DO UPDATE SET code = EXCLUDED.code, expires_at = EXCLUDED.expires_at
+            ''', (email, code, expires_at))
+        else:
+            cursor.execute('''
+                INSERT OR REPLACE INTO verification_codes (email, code, expires_at)
+                VALUES (?, ?, ?)
+            ''', (email, code, expires_at))
         conn.commit()
     
     if send_verification_email(email, code):
@@ -192,18 +276,20 @@ def register_user(email: str, password: str) -> tuple[bool, str]:
 
 def verify_email(email: str, code: str) -> tuple[bool, str, Optional[str]]:
     """Verify email with code and complete registration."""
+    ph = get_placeholder()
+    
     with get_db() as conn:
         cursor = conn.cursor()
         
         # Check verification code
-        cursor.execute('SELECT code, expires_at FROM verification_codes WHERE email = ?', (email,))
+        cursor.execute(f'SELECT code, expires_at FROM verification_codes WHERE email = {ph}', (email,))
         stored = cursor.fetchone()
         
         if not stored:
             return False, "No verification pending for this email", None
         
         if datetime.now() > datetime.fromisoformat(stored['expires_at']):
-            cursor.execute('DELETE FROM verification_codes WHERE email = ?', (email,))
+            cursor.execute(f'DELETE FROM verification_codes WHERE email = {ph}', (email,))
             conn.commit()
             return False, "Verification code expired", None
         
@@ -217,13 +303,20 @@ def verify_email(email: str, code: str) -> tuple[bool, str, Optional[str]]:
         
         # Create or update user
         user_id = secrets.token_urlsafe(16)
-        cursor.execute('''
-            INSERT OR REPLACE INTO users (id, email, password_hash, is_verified, created_at)
-            VALUES (?, ?, ?, 1, ?)
-        ''', (user_id, email, password_hash, datetime.now().isoformat()))
+        if USE_POSTGRES:
+            cursor.execute('''
+                INSERT INTO users (id, email, password_hash, is_verified, created_at)
+                VALUES (%s, %s, %s, 1, %s)
+                ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash, is_verified = 1
+            ''', (user_id, email, password_hash, datetime.now().isoformat()))
+        else:
+            cursor.execute('''
+                INSERT OR REPLACE INTO users (id, email, password_hash, is_verified, created_at)
+                VALUES (?, ?, ?, 1, ?)
+            ''', (user_id, email, password_hash, datetime.now().isoformat()))
         
         # Clean up
-        cursor.execute('DELETE FROM verification_codes WHERE email = ?', (email,))
+        cursor.execute(f'DELETE FROM verification_codes WHERE email = {ph}', (email,))
         conn.commit()
         
         if email in pending_registrations:
@@ -231,8 +324,8 @@ def verify_email(email: str, code: str) -> tuple[bool, str, Optional[str]]:
         
         # Create session
         token = generate_session_token()
-        cursor.execute('''
-            INSERT INTO sessions (token, email, created_at) VALUES (?, ?, ?)
+        cursor.execute(f'''
+            INSERT INTO sessions (token, email, created_at) VALUES ({ph}, {ph}, {ph})
         ''', (token, email, datetime.now().isoformat()))
         conn.commit()
         
@@ -240,10 +333,12 @@ def verify_email(email: str, code: str) -> tuple[bool, str, Optional[str]]:
 
 def login_user(email: str, password: str) -> tuple[bool, str, Optional[str]]:
     """Log in an existing user with email and password."""
+    ph = get_placeholder()
+    
     with get_db() as conn:
         cursor = conn.cursor()
         
-        cursor.execute('SELECT id, password_hash, is_verified FROM users WHERE email = ?', (email,))
+        cursor.execute(f'SELECT id, password_hash, is_verified FROM users WHERE email = {ph}', (email,))
         user = cursor.fetchone()
         
         if not user:
@@ -257,8 +352,8 @@ def login_user(email: str, password: str) -> tuple[bool, str, Optional[str]]:
         
         # Create session
         token = generate_session_token()
-        cursor.execute('''
-            INSERT INTO sessions (token, email, created_at) VALUES (?, ?, ?)
+        cursor.execute(f'''
+            INSERT INTO sessions (token, email, created_at) VALUES ({ph}, {ph}, {ph})
         ''', (token, email, datetime.now().isoformat()))
         conn.commit()
         
@@ -266,16 +361,18 @@ def login_user(email: str, password: str) -> tuple[bool, str, Optional[str]]:
 
 def get_user_by_token(token: str) -> Optional[dict]:
     """Get user data from session token."""
+    ph = get_placeholder()
+    
     with get_db() as conn:
         cursor = conn.cursor()
         
-        cursor.execute('SELECT email FROM sessions WHERE token = ?', (token,))
+        cursor.execute(f'SELECT email FROM sessions WHERE token = {ph}', (token,))
         session = cursor.fetchone()
         
         if not session:
             return None
         
-        cursor.execute('SELECT id, email, is_verified, created_at FROM users WHERE email = ?', (session['email'],))
+        cursor.execute(f'SELECT id, email, is_verified, created_at FROM users WHERE email = {ph}', (session['email'],))
         user = cursor.fetchone()
         
         if user:
@@ -284,9 +381,11 @@ def get_user_by_token(token: str) -> Optional[dict]:
 
 def logout_user(token: str) -> bool:
     """Remove session token."""
+    ph = get_placeholder()
+    
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute('DELETE FROM sessions WHERE token = ?', (token,))
+        cursor.execute(f'DELETE FROM sessions WHERE token = {ph}', (token,))
         conn.commit()
         return cursor.rowcount > 0
 
@@ -297,32 +396,56 @@ def save_user_course(email: str, course_data: dict) -> bool:
     with get_db() as conn:
         cursor = conn.cursor()
         
-        cursor.execute('''
-            INSERT OR REPLACE INTO user_courses 
-            (user_email, course_id, title, topic, level, progress_percent, chapters_json, last_accessed)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            email,
-            course_data.get('course_id'),
-            course_data.get('title'),
-            course_data.get('topic', ''),
-            course_data.get('level', 'Beginner'),
-            course_data.get('progress_percent', 0),
-            json.dumps(course_data.get('chapters', [])),
-            datetime.now().isoformat()
-        ))
+        if USE_POSTGRES:
+            cursor.execute('''
+                INSERT INTO user_courses 
+                (user_email, course_id, title, topic, level, progress_percent, chapters_json, last_accessed)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (user_email, course_id) DO UPDATE SET
+                    title = EXCLUDED.title,
+                    topic = EXCLUDED.topic,
+                    level = EXCLUDED.level,
+                    progress_percent = EXCLUDED.progress_percent,
+                    chapters_json = EXCLUDED.chapters_json,
+                    last_accessed = EXCLUDED.last_accessed
+            ''', (
+                email,
+                course_data.get('course_id'),
+                course_data.get('title'),
+                course_data.get('topic', ''),
+                course_data.get('level', 'Beginner'),
+                course_data.get('progress_percent', 0),
+                json.dumps(course_data.get('chapters', [])),
+                datetime.now().isoformat()
+            ))
+        else:
+            cursor.execute('''
+                INSERT OR REPLACE INTO user_courses 
+                (user_email, course_id, title, topic, level, progress_percent, chapters_json, last_accessed)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                email,
+                course_data.get('course_id'),
+                course_data.get('title'),
+                course_data.get('topic', ''),
+                course_data.get('level', 'Beginner'),
+                course_data.get('progress_percent', 0),
+                json.dumps(course_data.get('chapters', [])),
+                datetime.now().isoformat()
+            ))
         conn.commit()
         return True
 
 def get_user_courses(email: str) -> list:
     """Get all courses for a user."""
     import json
+    ph = get_placeholder()
     
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute('''
+        cursor.execute(f'''
             SELECT course_id, title, topic, level, progress_percent, chapters_json, last_accessed 
-            FROM user_courses WHERE user_email = ? 
+            FROM user_courses WHERE user_email = {ph} 
             ORDER BY last_accessed DESC
         ''', (email,))
         
@@ -337,24 +460,28 @@ def get_user_courses(email: str) -> list:
 
 def update_course_progress(email: str, course_id: str, progress_percent: int) -> bool:
     """Update the progress of a specific course."""
+    ph = get_placeholder()
+    
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute('''
+        cursor.execute(f'''
             UPDATE user_courses 
-            SET progress_percent = ?, last_accessed = ?
-            WHERE user_email = ? AND course_id = ?
+            SET progress_percent = {ph}, last_accessed = {ph}
+            WHERE user_email = {ph} AND course_id = {ph}
         ''', (progress_percent, datetime.now().isoformat(), email, course_id))
         conn.commit()
         return cursor.rowcount > 0
 
 def get_cached_lesson(course_id: str, lesson_title: str) -> Optional[dict]:
     """Get a cached lesson if it exists."""
+    ph = get_placeholder()
+    
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute('''
+        cursor.execute(f'''
             SELECT lesson_title, content_markdown, mermaid_code, explanation
             FROM lessons 
-            WHERE course_id = ? AND lesson_title = ?
+            WHERE course_id = {ph} AND lesson_title = {ph}
         ''', (course_id, lesson_title))
         
         row = cursor.fetchone()
@@ -372,11 +499,24 @@ def save_cached_lesson(course_id: str, lesson_title: str, topic: str, level: str
     """Save a generated lesson to cache."""
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute('''
-            INSERT OR REPLACE INTO lessons 
-            (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, 
-              datetime.now().isoformat()))
+        
+        if USE_POSTGRES:
+            cursor.execute('''
+                INSERT INTO lessons 
+                (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (course_id, lesson_title) DO UPDATE SET
+                    content_markdown = EXCLUDED.content_markdown,
+                    mermaid_code = EXCLUDED.mermaid_code,
+                    explanation = EXCLUDED.explanation
+            ''', (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, 
+                  datetime.now().isoformat()))
+        else:
+            cursor.execute('''
+                INSERT OR REPLACE INTO lessons 
+                (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, 
+                  datetime.now().isoformat()))
         conn.commit()
         return True
