@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { User, LogOut, Settings } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { api } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 export default function Header() {
     const router = useRouter();
@@ -16,10 +16,22 @@ export default function Header() {
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('auth_token');
-        const email = localStorage.getItem('user_email');
-        setIsLoggedIn(!!token);
-        setUserEmail(email || '');
+        // Check Supabase session
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            setIsLoggedIn(!!session);
+            setUserEmail(session?.user?.email || localStorage.getItem('user_email') || '');
+        };
+
+        checkSession();
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            setIsLoggedIn(!!session);
+            setUserEmail(session?.user?.email || '');
+        });
+
+        return () => subscription.unsubscribe();
     }, [pathname]);
 
     useEffect(() => {
@@ -34,22 +46,12 @@ export default function Header() {
 
     const handleLogout = async () => {
         try {
-            const token = localStorage.getItem('auth_token');
-            if (token) {
-                // Try to call logout API, but don't block on it
-                fetch(api.logout, {
-                    method: 'POST',
-                    headers: { Authorization: `Bearer ${token}` },
-                }).catch(() => {
-                    // Ignore errors - we're logging out anyway
-                });
-            }
-        } catch {
-            // Ignore any errors
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error('Logout error:', error);
         }
 
         // Always clear local storage and redirect
-        localStorage.removeItem('auth_token');
         localStorage.removeItem('user_email');
         localStorage.removeItem('current_course');
         setIsLoggedIn(false);

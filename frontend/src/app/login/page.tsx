@@ -1,94 +1,71 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, ArrowRight, Loader2, Sparkles, CheckCircle2, KeyRound, Lock, Eye, EyeOff } from 'lucide-react';
-import { api } from '@/lib/api';
+import { Mail, ArrowRight, Loader2, Sparkles, CheckCircle2, Lock, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
-type Step = 'auth' | 'verify';
 type Mode = 'login' | 'register';
 
 export default function LoginPage() {
     const router = useRouter();
-    const [step, setStep] = useState<Step>('auth');
     const [mode, setMode] = useState<Mode>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [code, setCode] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
 
+    // Check if already logged in
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                router.push('/dashboard');
+            }
+        });
+    }, [router]);
+
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+        setMessage('');
 
         try {
             if (mode === 'login') {
-                // Direct login
-                const response = await fetch(api.login, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password }),
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password,
                 });
 
-                const data = await response.json();
+                if (error) throw error;
 
-                if (!response.ok) {
-                    throw new Error(data.detail || 'Login failed');
+                if (data.session) {
+                    localStorage.setItem('user_email', email);
+                    router.push('/dashboard');
                 }
-
-                localStorage.setItem('auth_token', data.token);
-                localStorage.setItem('user_email', email);
-                router.push('/dashboard');
             } else {
-                // Register - send verification code
-                const response = await fetch(api.register, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password }),
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        emailRedirectTo: `${window.location.origin}/auth/callback`,
+                    }
                 });
 
-                const data = await response.json();
+                if (error) throw error;
 
-                if (!response.ok) {
-                    throw new Error(data.detail || 'Registration failed');
+                if (data.user && !data.session) {
+                    // Email confirmation required
+                    setMessage('Check your email for the confirmation link!');
+                } else if (data.session) {
+                    // Auto-confirmed (happens for existing users sometimes)
+                    localStorage.setItem('user_email', email);
+                    router.push('/dashboard');
                 }
-
-                setMessage('Check your email for the verification code!');
-                setStep('verify');
             }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Something went wrong');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleVerify = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-
-        try {
-            const response = await fetch(api.verify, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, code }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || 'Verification failed');
-            }
-
-            localStorage.setItem('auth_token', data.token);
-            localStorage.setItem('user_email', email);
-            router.push('/dashboard');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Something went wrong');
         } finally {
@@ -131,173 +108,107 @@ export default function LoginPage() {
                             </div>
                         </div>
                         <h1 className="text-4xl font-black text-white tracking-tight">
-                            {step === 'auth'
-                                ? (mode === 'login' ? 'Welcome Back!' : 'Create Account')
-                                : 'Verify Email'
-                            }
+                            {mode === 'login' ? 'Welcome Back!' : 'Create Account'}
                         </h1>
                         <p className="text-slate-400 mt-3">
-                            {step === 'auth'
-                                ? (mode === 'login' ? 'Log in to continue your learning' : 'Start your personalized learning journey')
-                                : 'Enter the code we sent to your email'
-                            }
+                            {mode === 'login' ? 'Log in to continue your learning' : 'Start your personalized learning journey'}
                         </p>
                     </div>
 
                     {/* Card */}
                     <div className="glass-dark border border-white/10 rounded-[2.5rem] p-8 shadow-2xl">
                         <AnimatePresence mode="wait">
-                            {step === 'auth' ? (
-                                <motion.form
-                                    key="auth"
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: 20 }}
-                                    onSubmit={handleAuth}
-                                    className="space-y-6"
-                                >
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-300">Email Address</label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-                                            <input
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                placeholder="you@example.com"
-                                                required
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2AB7CA]/50 focus:border-[#2AB7CA] transition-all"
-                                            />
-                                        </div>
+                            <motion.form
+                                key={mode}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
+                                onSubmit={handleAuth}
+                                className="space-y-6"
+                            >
+                                {message && (
+                                    <div className="flex items-center gap-3 text-[#FED766] text-sm bg-[#FED766]/10 border border-[#FED766]/20 rounded-xl p-4">
+                                        <CheckCircle2 size={20} />
+                                        <span>{message}</span>
                                     </div>
+                                )}
 
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-300">Password</label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-                                            <input
-                                                type={showPassword ? "text" : "password"}
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                placeholder="••••••••"
-                                                required
-                                                minLength={6}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2AB7CA]/50 focus:border-[#2AB7CA] transition-all"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-                                            >
-                                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                            </button>
-                                        </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300">Email Address</label>
+                                    <div className="relative">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="you@example.com"
+                                            required
+                                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2AB7CA]/50 focus:border-[#2AB7CA] transition-all"
+                                        />
                                     </div>
+                                </div>
 
-                                    {error && (
-                                        <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                                            {error}
-                                        </p>
-                                    )}
-
-                                    <button
-                                        type="submit"
-                                        disabled={loading || !email || !password}
-                                        className="w-full bg-gradient-to-r from-[#2AB7CA] to-[#2AB7CA] hover:from-[#2AB7CA] hover:to-indigo-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#2AB7CA]/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {loading ? (
-                                            <Loader2 className="animate-spin" size={20} />
-                                        ) : (
-                                            <>
-                                                {mode === 'login' ? 'Log In' : 'Create Account'}
-                                                <ArrowRight size={18} />
-                                            </>
-                                        )}
-                                    </button>
-
-                                    <div className="text-center">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300">Password</label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="••••••••"
+                                            required
+                                            minLength={6}
+                                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#2AB7CA]/50 focus:border-[#2AB7CA] transition-all"
+                                        />
                                         <button
                                             type="button"
-                                            onClick={() => {
-                                                setMode(mode === 'login' ? 'register' : 'login');
-                                                setError('');
-                                            }}
-                                            className="text-slate-400 hover:text-white text-sm transition-colors"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
                                         >
-                                            {mode === 'login'
-                                                ? "Don't have an account? Sign up"
-                                                : "Already have an account? Log in"
-                                            }
+                                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                         </button>
                                     </div>
-                                </motion.form>
-                            ) : (
-                                <motion.form
-                                    key="verify"
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    onSubmit={handleVerify}
-                                    className="space-y-6"
+                                </div>
+
+                                {error && (
+                                    <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+                                        {error}
+                                    </p>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={loading || !email || !password}
+                                    className="w-full bg-gradient-to-r from-[#2AB7CA] to-[#2AB7CA] hover:from-[#2AB7CA] hover:to-indigo-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#2AB7CA]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {message && (
-                                        <div className="flex items-center gap-3 text-[#FED766] text-sm bg-[#FED766]/10 border border-[#FED766]/20 rounded-xl p-4">
-                                            <CheckCircle2 size={20} />
-                                            <span>{message}</span>
-                                        </div>
+                                    {loading ? (
+                                        <Loader2 className="animate-spin" size={20} />
+                                    ) : (
+                                        <>
+                                            {mode === 'login' ? 'Log In' : 'Create Account'}
+                                            <ArrowRight size={18} />
+                                        </>
                                     )}
+                                </button>
 
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-300">Verification Code</label>
-                                        <div className="relative">
-                                            <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-                                            <input
-                                                type="text"
-                                                value={code}
-                                                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                                placeholder="Enter 6-digit code"
-                                                required
-                                                maxLength={6}
-                                                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white text-center text-2xl tracking-[0.5em] font-mono placeholder:text-slate-500 placeholder:tracking-normal placeholder:text-base focus:outline-none focus:ring-2 focus:ring-[#2AB7CA]/50 focus:border-[#2AB7CA] transition-all"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {error && (
-                                        <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                                            {error}
-                                        </p>
-                                    )}
-
-                                    <button
-                                        type="submit"
-                                        disabled={loading || code.length !== 6}
-                                        className="w-full bg-gradient-to-r from-[#FED766] to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#FED766]/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {loading ? (
-                                            <Loader2 className="animate-spin" size={20} />
-                                        ) : (
-                                            <>
-                                                Verify & Continue
-                                                <ArrowRight size={18} />
-                                            </>
-                                        )}
-                                    </button>
-
+                                <div className="text-center">
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            setStep('auth');
-                                            setCode('');
+                                            setMode(mode === 'login' ? 'register' : 'login');
                                             setError('');
                                             setMessage('');
                                         }}
-                                        className="w-full text-slate-400 hover:text-white text-sm transition-colors"
+                                        className="text-slate-400 hover:text-white text-sm transition-colors"
                                     >
-                                        ← Back
+                                        {mode === 'login'
+                                            ? "Don't have an account? Sign up"
+                                            : "Already have an account? Log in"
+                                        }
                                     </button>
-                                </motion.form>
-                            )}
+                                </div>
+                            </motion.form>
                         </AnimatePresence>
                     </div>
 
@@ -310,4 +221,3 @@ export default function LoginPage() {
         </div>
     );
 }
-

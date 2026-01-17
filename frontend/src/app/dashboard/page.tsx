@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
 import { api } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 interface Course {
     course_id: string;
@@ -113,24 +114,26 @@ export default function DashboardPage() {
     }, []);
 
     const checkAuth = async () => {
-        const token = localStorage.getItem('auth_token');
-        const email = localStorage.getItem('user_email');
+        const { data: { session } } = await supabase.auth.getSession();
 
-        if (!token) {
+        if (!session) {
             router.push('/login');
             return;
         }
 
-        setUser({ email: email || '' });
-        await fetchCourses(token);
-        await fetchSuggestions(token);
+        setUser({ email: session.user.email || '' });
+        await fetchCourses();
+        await fetchSuggestions();
         setLoading(false);
     };
 
-    const fetchCourses = async (token: string) => {
+    const fetchCourses = async () => {
         try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+
             const response = await fetch(api.courses, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${session.access_token}` },
             });
 
             if (response.ok) {
@@ -142,11 +145,14 @@ export default function DashboardPage() {
         }
     };
 
-    const fetchSuggestions = async (token: string) => {
+    const fetchSuggestions = async () => {
         setLoadingSuggestions(true);
         try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+
             const response = await fetch(api.suggestions, {
-                headers: { Authorization: `Bearer ${token}` },
+                headers: { Authorization: `Bearer ${session.access_token}` },
             });
 
             if (response.ok) {
@@ -161,16 +167,10 @@ export default function DashboardPage() {
     };
 
     const handleLogout = async () => {
-        const token = localStorage.getItem('auth_token');
-        if (token) {
-            await fetch(api.logout, {
-                method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
-            });
-        }
-        localStorage.removeItem('auth_token');
+        await supabase.auth.signOut();
         localStorage.removeItem('user_email');
-        router.push('/login');
+        localStorage.removeItem('current_course');
+        window.location.href = '/login';
     };
 
     const handleStartCourse = (suggestion: Suggestion) => {
