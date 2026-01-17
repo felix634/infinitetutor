@@ -45,8 +45,10 @@ mermaid.initialize({
     flowchart: {
         htmlLabels: true,
         curve: 'basis',
-        nodeSpacing: 50,
-        rankSpacing: 50,
+        nodeSpacing: 80,
+        rankSpacing: 80,
+        padding: 25,
+        useMaxWidth: true,
     },
 });
 
@@ -87,11 +89,20 @@ export default function MermaidRenderer({ chart }: MermaidRendererProps) {
                                 fill: #0B0C10 !important; 
                                 color: #0B0C10 !important;
                                 font-weight: 600 !important;
+                                font-size: 12px !important;
+                            }
+                            .node .label foreignObject {
+                                overflow: visible !important;
+                            }
+                            .node .label foreignObject div {
+                                white-space: nowrap !important;
+                                font-size: 12px !important;
                             }
                             .edgeLabel, .edgeLabel text, .edgeLabel span {
                                 fill: #f1f5f9 !important;
                                 color: #f1f5f9 !important;
                                 background-color: #0B0C10 !important;
+                                font-size: 11px !important;
                             }
                             .label text, text {
                                 fill: #0B0C10 !important;
