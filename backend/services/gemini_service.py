@@ -157,7 +157,16 @@ def generate_lesson_content(request: LessonContentRequest) -> Dict[str, Any]:
     
     The content should include:
     1. A long, engaging guide in Markdown format.
-    2. A Mermaid.js diagram code that visualizes the concept.
+    2. A Mermaid.js MINDMAP diagram (NOT flowchart) that visualizes the main concepts.
+       - Use the mindmap syntax: mindmap
+         root((Main Topic))
+           Branch1
+             Leaf1
+             Leaf2
+           Branch2
+       - Keep labels SHORT (max 3-4 words)
+       - Use emojis to make it visual (📚 🎯 💡 🔑 ⚡ 🌟 etc.)
+       - Maximum 4 main branches, 2-3 leaves per branch
     3. A creative DALL-E/Stable Diffusion image prompt that fits the lesson theme.
     4. A 1-sentence summary.
     
@@ -165,7 +174,7 @@ def generate_lesson_content(request: LessonContentRequest) -> Dict[str, Any]:
     {{
         "lesson_title": "{request.lesson_title}",
         "content_markdown": "Markdown string here...",
-        "mermaid_code": "Mermaid code here...",
+        "mermaid_code": "mindmap\\n  root((Topic))\\n    Branch1\\n      Leaf1",
         "image_prompt": "Prompt here...",
         "summary": "Summary here."
     }}

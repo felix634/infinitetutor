@@ -12,7 +12,7 @@ mermaid.initialize({
         background: '#0B0C10',
         primaryColor: '#2AB7CA',
         secondaryColor: '#FED766',
-        tertiaryColor: '#2AB7CA',
+        tertiaryColor: '#45B7AA',
 
         // Text colors - dark text for colored backgrounds
         primaryTextColor: '#0B0C10',
@@ -32,15 +32,15 @@ mermaid.initialize({
         // Edge/Arrow colors
         edgeLabelBackground: '#0B0C10',
 
-        // Special node colors - alternate between Cyber Blue and Neural Gold
+        // Special node colors - alternate between brand colors
         fillType0: '#2AB7CA',
         fillType1: '#FED766',
-        fillType2: '#2AB7CA',
-        fillType3: '#FED766',
+        fillType2: '#45B7AA',
+        fillType3: '#E8B4BC',
         fillType4: '#2AB7CA',
         fillType5: '#FED766',
-        fillType6: '#2AB7CA',
-        fillType7: '#FED766',
+        fillType6: '#45B7AA',
+        fillType7: '#E8B4BC',
     },
     flowchart: {
         htmlLabels: true,
@@ -48,6 +48,10 @@ mermaid.initialize({
         nodeSpacing: 80,
         rankSpacing: 80,
         padding: 25,
+        useMaxWidth: true,
+    },
+    mindmap: {
+        padding: 20,
         useMaxWidth: true,
     },
 });
