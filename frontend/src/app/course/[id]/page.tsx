@@ -16,6 +16,7 @@ import {
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
 import { api } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 interface Lesson {
     title: string;
@@ -62,12 +63,12 @@ export default function CourseDashboard() {
             }
         }
 
-        // Fetch from API if logged in
-        const token = localStorage.getItem('auth_token');
-        if (token) {
+        // Fetch from API if logged in with Supabase
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
             try {
                 const response = await fetch(api.course(params.id as string), {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${session.access_token}` }
                 });
 
                 if (response.ok) {
