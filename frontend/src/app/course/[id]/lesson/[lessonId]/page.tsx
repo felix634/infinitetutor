@@ -9,6 +9,7 @@ import MermaidRenderer from '@/components/MermaidRenderer';
 import QuizModal from '@/components/QuizModal';
 import Header from '@/components/Header';
 import { api } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 
 interface LessonContent {
     lesson_title: string;
@@ -82,12 +83,46 @@ export default function LessonPage() {
         }
     };
 
-    const handlePass = () => {
+    const handlePass = async () => {
         setIsPassed(true);
         const urlLessonTitle = decodeURIComponent(params.lessonId as string);
         const progress = JSON.parse(localStorage.getItem('course_progress') || '{}');
         progress[urlLessonTitle] = true;
         localStorage.setItem('course_progress', JSON.stringify(progress));
+
+        // Sync progress to backend
+        const savedCourse = localStorage.getItem('current_course');
+        if (savedCourse) {
+            const course = JSON.parse(savedCourse);
+            const totalLessons = course.chapters?.reduce((acc: number, c: { lessons: string[] }) => acc + c.lessons.length, 0) || 1;
+            const completedLessons = Object.keys(progress).length;
+            const progressPercent = Math.round((completedLessons / totalLessons) * 100);
+
+            // Update backend with progress
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
+                try {
+                    await fetch(api.saveCourse, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${session.access_token}`
+                        },
+                        body: JSON.stringify({
+                            course_id: course.course_id,
+                            title: course.title,
+                            topic: course.topic || course.title,
+                            level: course.level || 'Intermediate',
+                            progress_percent: progressPercent,
+                            chapters: course.chapters || []
+                        }),
+                    });
+                    console.log('✅ Progress synced to backend:', progressPercent + '%');
+                } catch (err) {
+                    console.error('Failed to sync progress:', err);
+                }
+            }
+        }
     };
 
     if (loading) {
