@@ -43,15 +43,28 @@ export default function IntakeWizard() {
         }
     };
 
+    const [error, setError] = useState<string | null>(null);
+
     const handleSubmit = async () => {
         setLoading(true);
+        setError(null);
         try {
             const response = await fetch(api.generateSyllabus, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
             const data = await response.json();
+
+            if (!data || !data.course_id) {
+                throw new Error('Invalid response from server');
+            }
+
             console.log('Syllabus generated:', data);
 
             // Save to localStorage for the dashboard to pick up
@@ -95,10 +108,11 @@ export default function IntakeWizard() {
                 console.log('No Supabase session - course saved to localStorage only');
             }
 
-            // Navigate to the dashboard
+            // Navigate to the course page
             router.push(`/course/${data.course_id}`);
-        } catch (error) {
-            console.error('Error generating syllabus:', error);
+        } catch (err) {
+            console.error('Error generating syllabus:', err);
+            setError(err instanceof Error ? err.message : 'Failed to generate syllabus. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -231,6 +245,16 @@ export default function IntakeWizard() {
                         )}
                     </motion.div>
                 </AnimatePresence>
+
+                {/* Error message display */}
+                {error && (
+                    <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="font-bold">⚠️ Error</span>
+                        </div>
+                        <p>{error}</p>
+                    </div>
+                )}
 
                 <div className="mt-12 flex items-center justify-between">
                     <button
