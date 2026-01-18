@@ -163,63 +163,71 @@ export default function LessonPage() {
         <div className="min-h-screen bg-[#0B0C10] text-slate-50">
             <Header />
 
-            <main className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-6 max-w-4xl mx-auto space-y-10 md:space-y-16">
-                {/* Hero Section */}
-                <section className="space-y-4 md:space-y-6">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-4"
-                    >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 text-[#2AB7CA] text-xs font-bold uppercase tracking-tighter">
-                            Lesson Content
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
-                            {content.lesson_title}
-                        </h1>
-                        <p className="text-base md:text-xl text-slate-400 max-w-2xl leading-relaxed">
-                            {content.summary}
-                        </p>
-                    </motion.div>
-                </section>
+            <main className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-6 max-w-7xl mx-auto">
+                {/* Two-column layout: Content + Notes sidebar */}
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* Left column: Lesson content */}
+                    <div className="flex-1 space-y-10 md:space-y-16 min-w-0">
+                        {/* Hero Section */}
+                        <section className="space-y-4 md:space-y-6">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="space-y-4"
+                            >
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 text-[#2AB7CA] text-xs font-bold uppercase tracking-tighter">
+                                    Lesson Content
+                                </div>
+                                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+                                    {content.lesson_title}
+                                </h1>
+                                <p className="text-base md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+                                    {content.summary}
+                                </p>
+                            </motion.div>
+                        </section>
 
-                {/* Main Content */}
-                <section className="prose prose-invert prose-indigo max-w-none">
-                    <div className="glass-dark border border-white/5 rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 lg:p-12 shadow-2xl space-y-6 md:space-y-8">
-                        <div className="text-slate-300 text-base md:text-lg leading-relaxed space-y-6 markdown-content">
-                            <ReactMarkdown>
-                                {content.content_markdown}
-                            </ReactMarkdown>
+                        {/* Main Content */}
+                        <section className="prose prose-invert prose-indigo max-w-none">
+                            <div className="glass-dark border border-white/5 rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 lg:p-12 shadow-2xl space-y-6 md:space-y-8">
+                                <div className="text-slate-300 text-base md:text-lg leading-relaxed space-y-6 markdown-content">
+                                    <ReactMarkdown>
+                                        {content.content_markdown}
+                                    </ReactMarkdown>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Visual Model */}
+                        <section className="space-y-8">
+                            <div className="flex items-center gap-3">
+                                <Zap className="text-[#FED766]" size={24} />
+                                <h2 className="text-2xl font-bold">Visual Mental Model</h2>
+                            </div>
+                            <div className="glass-dark border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
+                                <MermaidRenderer chart={content.mermaid_code} />
+                                <div className="mt-8 flex gap-4 p-6 bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 rounded-2xl">
+                                    <Info className="text-[#2AB7CA] shrink-0" size={20} />
+                                    <p className="text-slate-400 text-sm leading-relaxed">
+                                        This diagram summarizes the relationship between the key concepts of {content.lesson_title}.
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* Right column: Notes sidebar (sticky on desktop) */}
+                    <div className="lg:w-80 xl:w-96 flex-shrink-0">
+                        <div className="lg:sticky lg:top-28">
+                            <div className="glass-dark border border-white/5 rounded-2xl p-6 shadow-2xl">
+                                <NotesPanel
+                                    courseId={params.id as string}
+                                    lessonId={params.lessonId as string}
+                                />
+                            </div>
                         </div>
                     </div>
-                </section>
-
-                {/* Visual Model */}
-                <section className="space-y-8">
-                    <div className="flex items-center gap-3">
-                        <Zap className="text-[#FED766]" size={24} />
-                        <h2 className="text-2xl font-bold">Visual Mental Model</h2>
-                    </div>
-                    <div className="glass-dark border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
-                        <MermaidRenderer chart={content.mermaid_code} />
-                        <div className="mt-8 flex gap-4 p-6 bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 rounded-2xl">
-                            <Info className="text-[#2AB7CA] shrink-0" size={20} />
-                            <p className="text-slate-400 text-sm leading-relaxed">
-                                This diagram summarizes the relationship between the key concepts of {content.lesson_title}.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Notes Section */}
-                <section className="space-y-6">
-                    <div className="glass-dark border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
-                        <NotesPanel
-                            courseId={params.id as string}
-                            lessonId={params.lessonId as string}
-                        />
-                    </div>
-                </section>
+                </div>
 
                 {/* Footer / Quiz Trigger */}
                 <section className="pt-12">
