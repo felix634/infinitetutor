@@ -46,9 +46,11 @@ export default function LessonPage() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.lessonId]);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchLessonContent = async (title: string, topic: string, courseId: string) => {
         setLoading(true);
+        setError(null);
         try {
             const response = await fetch(api.generateLesson, {
                 method: 'POST',
@@ -60,10 +62,21 @@ export default function LessonPage() {
                     course_id: courseId  // Include course_id for caching
                 }),
             });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+
             const data = await response.json();
+
+            if (!data || !data.content_markdown) {
+                throw new Error('Invalid response from server');
+            }
+
             setContent(data);
-        } catch (error) {
-            console.error('Error fetching lesson:', error);
+        } catch (err) {
+            console.error('Error fetching lesson:', err);
+            setError(err instanceof Error ? err.message : 'Failed to load lesson');
         } finally {
             setLoading(false);
         }
@@ -83,6 +96,26 @@ export default function LessonPage() {
                 <div className="flex flex-col items-center gap-6">
                     <div className="w-16 h-16 border-4 border-[#2AB7CA] border-t-transparent rounded-full animate-spin" />
                     <p className="text-slate-400 font-medium animate-pulse">Generating your interactive lesson...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-[#0B0C10] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-6 text-center px-4">
+                    <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
+                        <span className="text-3xl">⚠️</span>
+                    </div>
+                    <h2 className="text-2xl font-bold text-white">Failed to Load Lesson</h2>
+                    <p className="text-slate-400 max-w-md">{error}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="px-6 py-3 bg-[#2AB7CA] text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors"
+                    >
+                        Try Again
+                    </button>
                 </div>
             </div>
         );
