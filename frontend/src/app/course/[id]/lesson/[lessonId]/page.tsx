@@ -7,6 +7,7 @@ import { BookOpen, ChevronRight, Zap, Info, PlayCircle, Trophy, CheckCircle2 } f
 import ReactMarkdown from 'react-markdown';
 import MermaidRenderer from '@/components/MermaidRenderer';
 import QuizModal from '@/components/QuizModal';
+import NotesPanel from '@/components/NotesPanel';
 import Header from '@/components/Header';
 import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
@@ -207,6 +208,16 @@ export default function LessonPage() {
                                 This diagram summarizes the relationship between the key concepts of {content.lesson_title}.
                             </p>
                         </div>
+                    </div>
+                </section>
+
+                {/* Notes Section */}
+                <section className="space-y-6">
+                    <div className="glass-dark border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
+                        <NotesPanel
+                            courseId={params.id as string}
+                            lessonId={params.lessonId as string}
+                        />
                     </div>
                 </section>
 

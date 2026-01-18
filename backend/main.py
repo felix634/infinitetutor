@@ -25,7 +25,9 @@ from services.auth_service import (
     save_user_course,
     get_user_courses,
     get_cached_lesson,
-    save_cached_lesson
+    save_cached_lesson,
+    get_user_note,
+    save_user_note
 )
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -170,6 +172,29 @@ async def get_suggestions(authorization: Optional[str] = Header(None)):
             {"title": "Introduction to Data Science", "description": "Learn the fundamentals of data analysis"},
             {"title": "Creative Writing Masterclass", "description": "Develop your storytelling skills"}
         ]}
+
+# ============ NOTES ENDPOINTS ============
+
+class SaveNoteRequest(BaseModel):
+    content: str
+
+@app.get("/user/notes/{course_id}/{lesson_id}")
+async def get_note(course_id: str, lesson_id: str, authorization: Optional[str] = Header(None)):
+    user = get_current_user(authorization)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    note_content = get_user_note(user["email"], course_id, lesson_id)
+    return {"content": note_content or ""}
+
+@app.post("/user/notes/{course_id}/{lesson_id}")
+async def save_note(course_id: str, lesson_id: str, request: SaveNoteRequest, authorization: Optional[str] = Header(None)):
+    user = get_current_user(authorization)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    save_user_note(user["email"], course_id, lesson_id, request.content)
+    return {"message": "Note saved successfully"}
 
 # ============ CONTENT GENERATION ENDPOINTS ============
 

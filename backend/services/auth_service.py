@@ -132,6 +132,18 @@ def init_db():
                     UNIQUE(course_id, lesson_title)
                 )
             ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_notes (
+                    id SERIAL PRIMARY KEY,
+                    user_email TEXT NOT NULL,
+                    course_id TEXT NOT NULL,
+                    lesson_id TEXT NOT NULL,
+                    content TEXT,
+                    updated_at TEXT NOT NULL,
+                    UNIQUE(user_email, course_id, lesson_id)
+                )
+            ''')
         else:
             # SQLite syntax
             cursor.execute('''
@@ -187,6 +199,18 @@ def init_db():
                     explanation TEXT,
                     created_at TEXT NOT NULL,
                     UNIQUE(course_id, lesson_title)
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_notes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_email TEXT NOT NULL,
+                    course_id TEXT NOT NULL,
+                    lesson_id TEXT NOT NULL,
+                    content TEXT,
+                    updated_at TEXT NOT NULL,
+                    UNIQUE(user_email, course_id, lesson_id)
                 )
             ''')
         
@@ -559,5 +583,46 @@ def save_cached_lesson(course_id: str, lesson_title: str, topic: str, level: str
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (course_id, lesson_title, topic, level, content_markdown, mermaid_code, explanation, 
                   datetime.now().isoformat()))
+        conn.commit()
+        return True
+
+# ============ NOTES FUNCTIONS ============
+
+def get_user_note(user_email: str, course_id: str, lesson_id: str) -> Optional[str]:
+    """Get user's note for a specific lesson."""
+    ph = get_placeholder()
+    
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute(f'''
+            SELECT content FROM user_notes 
+            WHERE user_email = {ph} AND course_id = {ph} AND lesson_id = {ph}
+        ''', (user_email, course_id, lesson_id))
+        
+        row = cursor.fetchone()
+        if row:
+            return row['content'] if isinstance(row, dict) else row[0]
+        return None
+
+def save_user_note(user_email: str, course_id: str, lesson_id: str, content: str) -> bool:
+    """Save or update user's note for a specific lesson."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        if USE_POSTGRES:
+            cursor.execute('''
+                INSERT INTO user_notes 
+                (user_email, course_id, lesson_id, content, updated_at)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (user_email, course_id, lesson_id) DO UPDATE SET
+                    content = EXCLUDED.content,
+                    updated_at = EXCLUDED.updated_at
+            ''', (user_email, course_id, lesson_id, content, datetime.now().isoformat()))
+        else:
+            cursor.execute('''
+                INSERT OR REPLACE INTO user_notes 
+                (user_email, course_id, lesson_id, content, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_email, course_id, lesson_id, content, datetime.now().isoformat()))
         conn.commit()
         return True
