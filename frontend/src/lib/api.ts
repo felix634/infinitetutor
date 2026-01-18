@@ -15,6 +15,9 @@ export const api = {
     saveCourse: `${API_URL}/user/save-course`,
     suggestions: `${API_URL}/user/suggestions`,
     notes: (courseId: string, lessonId: string) => `${API_URL}/user/notes/${courseId}/${lessonId}`,
+    stats: `${API_URL}/user/stats`,
+    activity: `${API_URL}/user/activity`,
+    goal: `${API_URL}/user/goal`,
 
     // Content endpoints
     generateSyllabus: `${API_URL}/generate-syllabus`,

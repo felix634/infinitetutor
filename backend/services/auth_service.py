@@ -5,7 +5,7 @@ import psycopg2
 import jwt
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Dict, Any
 from contextlib import contextmanager
 from urllib.parse import urlparse
 
@@ -144,6 +144,18 @@ def init_db():
                     UNIQUE(user_email, course_id, lesson_id)
                 )
             ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_activity (
+                    id SERIAL PRIMARY KEY,
+                    user_email TEXT NOT NULL,
+                    activity_date TEXT NOT NULL,
+                    minutes_studied INTEGER DEFAULT 0,
+                    lessons_completed INTEGER DEFAULT 0,
+                    daily_goal_minutes INTEGER DEFAULT 30,
+                    UNIQUE(user_email, activity_date)
+                )
+            ''')
         else:
             # SQLite syntax
             cursor.execute('''
@@ -211,6 +223,18 @@ def init_db():
                     content TEXT,
                     updated_at TEXT NOT NULL,
                     UNIQUE(user_email, course_id, lesson_id)
+                )
+            ''')
+            
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_activity (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_email TEXT NOT NULL,
+                    activity_date TEXT NOT NULL,
+                    minutes_studied INTEGER DEFAULT 0,
+                    lessons_completed INTEGER DEFAULT 0,
+                    daily_goal_minutes INTEGER DEFAULT 30,
+                    UNIQUE(user_email, activity_date)
                 )
             ''')
         
@@ -624,5 +648,140 @@ def save_user_note(user_email: str, course_id: str, lesson_id: str, content: str
                 (user_email, course_id, lesson_id, content, updated_at)
                 VALUES (?, ?, ?, ?, ?)
             ''', (user_email, course_id, lesson_id, content, datetime.now().isoformat()))
+        conn.commit()
+        return True
+
+# ============ ACTIVITY TRACKING FUNCTIONS ============
+
+def log_user_activity(user_email: str, minutes: int = 0, lessons: int = 0) -> bool:
+    """Log user activity for today. Adds to existing values."""
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        if USE_POSTGRES:
+            cursor.execute('''
+                INSERT INTO user_activity 
+                (user_email, activity_date, minutes_studied, lessons_completed, daily_goal_minutes)
+                VALUES (%s, %s, %s, %s, 30)
+                ON CONFLICT (user_email, activity_date) DO UPDATE SET
+                    minutes_studied = user_activity.minutes_studied + EXCLUDED.minutes_studied,
+                    lessons_completed = user_activity.lessons_completed + EXCLUDED.lessons_completed
+            ''', (user_email, today, minutes, lessons))
+        else:
+            # Check if exists
+            cursor.execute('''
+                SELECT minutes_studied, lessons_completed FROM user_activity 
+                WHERE user_email = ? AND activity_date = ?
+            ''', (user_email, today))
+            row = cursor.fetchone()
+            
+            if row:
+                cursor.execute('''
+                    UPDATE user_activity SET minutes_studied = ?, lessons_completed = ?
+                    WHERE user_email = ? AND activity_date = ?
+                ''', (row[0] + minutes, row[1] + lessons, user_email, today))
+            else:
+                cursor.execute('''
+                    INSERT INTO user_activity 
+                    (user_email, activity_date, minutes_studied, lessons_completed, daily_goal_minutes)
+                    VALUES (?, ?, ?, ?, 30)
+                ''', (user_email, today, minutes, lessons))
+        conn.commit()
+        return True
+
+def get_user_stats(user_email: str) -> Dict[str, Any]:
+    """Get user's streak, today's progress, and stats."""
+    today = datetime.now().strftime('%Y-%m-%d')
+    ph = get_placeholder()
+    
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        # Get today's activity
+        cursor.execute(f'''
+            SELECT minutes_studied, lessons_completed, daily_goal_minutes 
+            FROM user_activity 
+            WHERE user_email = {ph} AND activity_date = {ph}
+        ''', (user_email, today))
+        
+        row = cursor.fetchone()
+        today_minutes = row[0] if row else 0
+        today_lessons = row[1] if row else 0
+        daily_goal = row[2] if row else 30
+        
+        # Calculate streak
+        streak = calculate_streak(user_email)
+        
+        return {
+            "streak": streak,
+            "today_minutes": today_minutes,
+            "today_lessons": today_lessons,
+            "daily_goal_minutes": daily_goal,
+            "goal_progress_percent": min(100, int((today_minutes / daily_goal) * 100)) if daily_goal > 0 else 0
+        }
+
+def calculate_streak(user_email: str) -> int:
+    """Calculate the current study streak (consecutive days)."""
+    ph = get_placeholder()
+    
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        # Get all activity dates ordered descending
+        cursor.execute(f'''
+            SELECT activity_date FROM user_activity 
+            WHERE user_email = {ph} AND minutes_studied > 0
+            ORDER BY activity_date DESC
+        ''', (user_email,))
+        
+        rows = cursor.fetchall()
+        if not rows:
+            return 0
+        
+        streak = 0
+        expected_date = datetime.now().date()
+        
+        for row in rows:
+            activity_date = datetime.strptime(row[0] if isinstance(row, tuple) else row['activity_date'], '%Y-%m-%d').date()
+            
+            if activity_date == expected_date:
+                streak += 1
+                expected_date -= timedelta(days=1)
+            elif activity_date == expected_date - timedelta(days=1):
+                # Allow for missing today if checking yesterday
+                expected_date = activity_date
+                streak += 1
+                expected_date -= timedelta(days=1)
+            else:
+                break
+        
+        return streak
+
+def update_daily_goal(user_email: str, goal_minutes: int) -> bool:
+    """Update user's daily study goal."""
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    with get_db() as conn:
+        cursor = conn.cursor()
+        
+        if USE_POSTGRES:
+            cursor.execute('''
+                INSERT INTO user_activity 
+                (user_email, activity_date, minutes_studied, lessons_completed, daily_goal_minutes)
+                VALUES (%s, %s, 0, 0, %s)
+                ON CONFLICT (user_email, activity_date) DO UPDATE SET
+                    daily_goal_minutes = EXCLUDED.daily_goal_minutes
+            ''', (user_email, today, goal_minutes))
+        else:
+            cursor.execute('''
+                INSERT OR REPLACE INTO user_activity 
+                (user_email, activity_date, minutes_studied, lessons_completed, daily_goal_minutes)
+                VALUES (?, ?, 
+                    COALESCE((SELECT minutes_studied FROM user_activity WHERE user_email = ? AND activity_date = ?), 0),
+                    COALESCE((SELECT lessons_completed FROM user_activity WHERE user_email = ? AND activity_date = ?), 0),
+                    ?)
+            ''', (user_email, today, user_email, today, user_email, today, goal_minutes))
         conn.commit()
         return True

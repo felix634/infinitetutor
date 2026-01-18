@@ -27,7 +27,10 @@ from services.auth_service import (
     get_cached_lesson,
     save_cached_lesson,
     get_user_note,
-    save_user_note
+    save_user_note,
+    log_user_activity,
+    get_user_stats,
+    update_daily_goal
 )
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -195,6 +198,42 @@ async def save_note(course_id: str, lesson_id: str, request: SaveNoteRequest, au
     
     save_user_note(user["email"], course_id, lesson_id, request.content)
     return {"message": "Note saved successfully"}
+
+# ============ ACTIVITY TRACKING ENDPOINTS ============
+
+class LogActivityRequest(BaseModel):
+    minutes: int = 0
+    lessons: int = 0
+
+class UpdateGoalRequest(BaseModel):
+    goal_minutes: int
+
+@app.get("/user/stats")
+async def get_stats(authorization: Optional[str] = Header(None)):
+    user = get_current_user(authorization)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stats = get_user_stats(user["email"])
+    return stats
+
+@app.post("/user/activity")
+async def log_activity(request: LogActivityRequest, authorization: Optional[str] = Header(None)):
+    user = get_current_user(authorization)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    log_user_activity(user["email"], request.minutes, request.lessons)
+    return {"message": "Activity logged successfully"}
+
+@app.post("/user/goal")
+async def set_goal(request: UpdateGoalRequest, authorization: Optional[str] = Header(None)):
+    user = get_current_user(authorization)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    update_daily_goal(user["email"], request.goal_minutes)
+    return {"message": "Goal updated successfully"}
 
 # ============ CONTENT GENERATION ENDPOINTS ============
 

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
+import StatsWidget from '@/components/StatsWidget';
 import { api } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
@@ -219,6 +220,16 @@ export default function DashboardPage() {
                             : 'Celebrate your achievements and earned titles!'
                         }
                     </p>
+                </motion.section>
+
+                {/* Stats Widget */}
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="mb-8"
+                >
+                    <StatsWidget />
                 </motion.section>
 
                 {/* Tabs */}
