@@ -10,9 +10,12 @@ export const api = {
     notes: (courseId: string, lessonId: string) => `${FUNCTIONS_URL}/notes?course_id=${courseId}&lesson_id=${lessonId}`,
     stats: `${FUNCTIONS_URL}/stats`,
     activity: `${FUNCTIONS_URL}/stats`,
+    suggestions: `${FUNCTIONS_URL}/suggestions`,
+    logout: `${FUNCTIONS_URL}/logout`,
 
     // AI Content endpoints (Supabase Edge Functions)
     generateSyllabus: `${FUNCTIONS_URL}/generate-syllabus`,
     generateLesson: `${FUNCTIONS_URL}/generate-lesson`,
     generateQuiz: `${FUNCTIONS_URL}/generate-quiz`,
+    generateDiagram: `${FUNCTIONS_URL}/generate-diagram`,
 };
