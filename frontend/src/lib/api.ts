@@ -1,27 +1,17 @@
-// API configuration
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// API configuration - Using Supabase Edge Functions
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://bwwauiisvxkdnossqzto.supabase.co';
+export const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
 
 export const api = {
-    // Auth endpoints
-    register: `${API_URL}/auth/register`,
-    login: `${API_URL}/auth/login`,
-    verify: `${API_URL}/auth/verify`,
-    logout: `${API_URL}/auth/logout`,
-    me: `${API_URL}/auth/me`,
+    // User data endpoints (Supabase Edge Functions)
+    courses: `${FUNCTIONS_URL}/courses`,
+    saveCourse: `${FUNCTIONS_URL}/courses`,
+    notes: (courseId: string, lessonId: string) => `${FUNCTIONS_URL}/notes?course_id=${courseId}&lesson_id=${lessonId}`,
+    stats: `${FUNCTIONS_URL}/stats`,
+    activity: `${FUNCTIONS_URL}/stats`,
 
-    // User endpoints
-    courses: `${API_URL}/user/courses`,
-    course: (id: string) => `${API_URL}/user/course/${id}`,
-    saveCourse: `${API_URL}/user/save-course`,
-    suggestions: `${API_URL}/user/suggestions`,
-    notes: (courseId: string, lessonId: string) => `${API_URL}/user/notes/${courseId}/${lessonId}`,
-    stats: `${API_URL}/user/stats`,
-    activity: `${API_URL}/user/activity`,
-    goal: `${API_URL}/user/goal`,
-
-    // Content endpoints
-    generateSyllabus: `${API_URL}/generate-syllabus`,
-    generateLesson: `${API_URL}/generate-lesson`,
-    generateQuiz: `${API_URL}/generate-quiz`,
-    generateDiagram: `${API_URL}/generate-diagram`,
+    // AI Content endpoints (Supabase Edge Functions)
+    generateSyllabus: `${FUNCTIONS_URL}/generate-syllabus`,
+    generateLesson: `${FUNCTIONS_URL}/generate-lesson`,
+    generateQuiz: `${FUNCTIONS_URL}/generate-quiz`,
 };
