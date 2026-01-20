@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Sparkles, Brain, Clock, Target } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { api } from '@/lib/api';
+import { api, getSupabaseHeaders } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 type Step = 'topic' | 'level' | 'time';
@@ -51,7 +51,7 @@ export default function IntakeWizard() {
         try {
             const response = await fetch(api.generateSyllabus, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getSupabaseHeaders(),
                 body: JSON.stringify(formData),
             });
 
