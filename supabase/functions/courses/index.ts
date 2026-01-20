@@ -38,12 +38,39 @@ serve(async (req) => {
     }
 
     const url = new URL(req.url);
-    const pathParts = url.pathname.split("/").filter(Boolean);
-    const action = pathParts[pathParts.length - 1]; // Last part of path
+    const courseId = url.searchParams.get("course_id");
 
     try {
+        // GET /courses?course_id=xxx - Get a single course
+        if (req.method === "GET" && courseId) {
+            const { data, error } = await supabase
+                .from("user_courses")
+                .select("*")
+                .eq("user_email", userEmail)
+                .eq("course_id", courseId)
+                .single();
+
+            if (error && error.code !== "PGRST116") throw error;
+            if (!data) {
+                return new Response(
+                    JSON.stringify({ error: "Course not found" }),
+                    { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                );
+            }
+
+            // Parse chapters_json back to object
+            const course = {
+                ...data,
+                chapters: data.chapters_json ? JSON.parse(data.chapters_json) : []
+            };
+
+            return new Response(JSON.stringify(course), {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+        }
+
         // GET /courses - List all user courses
-        if (req.method === "GET" && action === "courses") {
+        if (req.method === "GET") {
             const { data, error } = await supabase
                 .from("user_courses")
                 .select("*")
@@ -57,7 +84,7 @@ serve(async (req) => {
         }
 
         // POST /courses - Save a course
-        if (req.method === "POST" && action === "courses") {
+        if (req.method === "POST") {
             const body = await req.json();
 
             const { error } = await supabase

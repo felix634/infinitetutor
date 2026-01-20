@@ -5,6 +5,7 @@ export const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
 export const api = {
     // User data endpoints (Supabase Edge Functions)
     courses: `${FUNCTIONS_URL}/courses`,
+    course: (id: string) => `${FUNCTIONS_URL}/courses?course_id=${id}`,
     saveCourse: `${FUNCTIONS_URL}/courses`,
     notes: (courseId: string, lessonId: string) => `${FUNCTIONS_URL}/notes?course_id=${courseId}&lesson_id=${lessonId}`,
     stats: `${FUNCTIONS_URL}/stats`,
