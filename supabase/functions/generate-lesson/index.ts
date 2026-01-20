@@ -83,7 +83,12 @@ serve(async (req) => {
             },
         });
 
-        const lessonData = JSON.parse(result.response.text());
+        let lessonData = JSON.parse(result.response.text());
+
+        // Handle case where Gemini returns an array instead of object
+        if (Array.isArray(lessonData)) {
+            lessonData = lessonData[0];
+        }
 
         // Cache the lesson
         await supabase.from("lessons").upsert({

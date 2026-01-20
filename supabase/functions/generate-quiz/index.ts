@@ -46,7 +46,12 @@ serve(async (req) => {
             },
         });
 
-        const quizData = JSON.parse(result.response.text());
+        let quizData = JSON.parse(result.response.text());
+
+        // Handle case where Gemini returns an array instead of object
+        if (Array.isArray(quizData)) {
+            quizData = quizData[0];
+        }
 
         return new Response(JSON.stringify(quizData), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
