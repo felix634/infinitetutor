@@ -52,7 +52,12 @@ serve(async (req) => {
         });
 
         const responseText = result.response.text();
-        const syllabusData = JSON.parse(responseText);
+        let syllabusData = JSON.parse(responseText);
+
+        // Handle case where Gemini returns an array instead of object
+        if (Array.isArray(syllabusData)) {
+            syllabusData = syllabusData[0];
+        }
 
         // Ensure course_id exists
         if (!syllabusData.course_id) {
