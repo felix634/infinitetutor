@@ -76,6 +76,19 @@ export default function MermaidRenderer({ chart }: MermaidRendererProps) {
                     cleanChart = cleanChart.replace(/^```mermaid\s*/i, '').replace(/```\s*$/i, '');
                     cleanChart = cleanChart.replace(/^```\s*/i, '').replace(/```\s*$/i, '');
 
+                    // For mindmaps, clean up problematic characters in labels
+                    if (cleanChart.toLowerCase().startsWith('mindmap')) {
+                        // Remove problematic emojis that break mermaid parsing
+                        // Keep simple emojis but remove complex ones with special chars
+                        cleanChart = cleanChart.replace(/[🔑🎯📚💡⚡🌟🔥💪🎓📊🧠🚀📝✨🎨🔬🏆]/g, '•');
+
+                        // Fix double parentheses in root nodes: root((text)) is correct, leave it
+                        // But remove any extra nested parens in regular nodes
+
+                        // Clean up any special unicode characters that might cause issues
+                        cleanChart = cleanChart.replace(/[\u200B-\u200D\uFEFF]/g, '');
+                    }
+
                     // Fix problematic node definitions with parentheses in the label
                     // Convert A[Label (with parens)] to A["Label with parens"]
                     // Convert B(Label with parens) to B["Label with parens"]

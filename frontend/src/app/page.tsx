@@ -13,9 +13,9 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative pt-28 md:pt-48 pb-16 md:pb-32 px-4 md:px-6 overflow-hidden">
         {/* Background blobs for depth - New brand colors - hidden on mobile */}
-        <div className="hidden md:block absolute top-1/4 -left-20 w-96 h-96 bg-[#2AB7CA]/10 rounded-full blur-[100px] -z-10 animate-pulse" />
-        <div className="hidden md:block absolute top-1/2 -right-20 w-96 h-96 bg-[#FED766]/10 rounded-full blur-[100px] -z-10 animate-pulse" />
-        <div className="hidden md:block absolute bottom-1/4 left-1/2 w-64 h-64 bg-[#2AB7CA]/5 rounded-full blur-[80px] -z-10" />
+        <div className="hidden md:block absolute top-1/4 -left-20 w-96 h-96 bg-[#2AB7CA]/10 rounded-full blur-[100px] -z-20 animate-pulse pointer-events-none" />
+        <div className="hidden md:block absolute top-1/2 -right-20 w-96 h-96 bg-[#FED766]/10 rounded-full blur-[100px] -z-20 animate-pulse pointer-events-none" />
+        <div className="hidden md:block absolute bottom-1/4 left-1/2 w-64 h-64 bg-[#2AB7CA]/5 rounded-full blur-[80px] -z-20 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
           {/* Hero Badge */}
