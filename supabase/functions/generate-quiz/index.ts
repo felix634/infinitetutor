@@ -24,7 +24,7 @@ serve(async (req) => {
 
         const prompt = `
     Generate a quiz for the lesson "${lesson_title}" from the course "${topic}" at "${level}" level.
-    Create exactly ${num_questions || 3} multiple-choice questions.
+    Create exactly ${num_questions || 6} multiple-choice questions.
     
     Return ONLY valid JSON:
     {

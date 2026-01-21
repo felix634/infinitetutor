@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, AlertCircle, ChevronRight, Trophy, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { api } from '@/lib/api';
+import { api, getSupabaseHeaders } from '@/lib/api';
 
 interface Question {
     question: string;
@@ -55,8 +55,13 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
         try {
             const response = await fetch(api.generateQuiz, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ lesson_title: lessonTitle, topic, level }),
+                headers: getSupabaseHeaders(),
+                body: JSON.stringify({
+                    lesson_title: lessonTitle,
+                    topic,
+                    level,
+                    num_questions: 6
+                }),
             });
             const data = await response.json();
             setQuiz(data);
