@@ -12,7 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
 import StatsWidget from '@/components/StatsWidget';
-import { api } from '@/lib/api';
+import { api, getSupabaseHeaders } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 interface Course {
@@ -134,12 +134,13 @@ export default function DashboardPage() {
             if (!session) return;
 
             const response = await fetch(api.courses, {
-                headers: { Authorization: `Bearer ${session.access_token}` },
+                headers: getSupabaseHeaders(session.access_token),
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setCourses(data.courses || []);
+                // Edge Function returns array directly, not {courses: [...]}
+                setCourses(Array.isArray(data) ? data : (data.courses || []));
             }
         } catch (error) {
             console.error('Failed to fetch courses:', error);
@@ -153,12 +154,13 @@ export default function DashboardPage() {
             if (!session) return;
 
             const response = await fetch(api.suggestions, {
-                headers: { Authorization: `Bearer ${session.access_token}` },
+                headers: getSupabaseHeaders(session.access_token),
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setSuggestions(data.suggestions || []);
+                // Edge Function returns array directly
+                setSuggestions(Array.isArray(data) ? data : (data.suggestions || []));
             }
         } catch (error) {
             console.error('Failed to fetch suggestions:', error);

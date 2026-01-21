@@ -81,10 +81,7 @@ export default function IntakeWizard() {
                     console.log('Saving course to profile with Supabase token');
                     const saveResponse = await fetch(api.saveCourse, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${session.access_token}`
-                        },
+                        headers: getSupabaseHeaders(session.access_token),
                         body: JSON.stringify({
                             course_id: data.course_id,
                             title: data.title,
