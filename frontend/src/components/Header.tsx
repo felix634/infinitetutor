@@ -129,7 +129,7 @@ export default function Header() {
 
                             {/* Dropdown Menu */}
                             {showProfileMenu && (
-                                <div className="absolute right-0 mt-2 w-64 glass-dark border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+                                <div className="absolute right-0 mt-2 w-64 bg-[#0f1419] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50">
                                     <div className="p-4 border-b border-white/5">
                                         <p className="text-sm font-medium text-white truncate">{userEmail}</p>
                                         <p className="text-xs text-slate-500 mt-0.5">Learner</p>
