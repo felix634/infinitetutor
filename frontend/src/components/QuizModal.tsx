@@ -9,7 +9,7 @@ import { api, getSupabaseHeaders } from '@/lib/api';
 interface Question {
     question: string;
     options: string[];
-    correct_answer: string;
+    correct_index: number;
     explanation: string;
 }
 
@@ -80,7 +80,9 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
     const handleSubmitAnswer = () => {
         if (!selectedAnswer || !quiz) return;
 
-        const isCorrect = selectedAnswer === quiz.questions[currentQuestionIndex].correct_answer;
+        const currentQuestion = quiz.questions[currentQuestionIndex];
+        const correctAnswer = currentQuestion.options[currentQuestion.correct_index];
+        const isCorrect = selectedAnswer === correctAnswer;
         if (isCorrect) setScore(score + 1);
 
         setIsAnswerSubmitted(true);
@@ -189,7 +191,7 @@ export default function QuizModal({ isOpen, onClose, lessonTitle, topic, level, 
                                     <div className="grid grid-cols-1 gap-3">
                                         {quiz.questions[currentQuestionIndex].options.map((option, idx) => {
                                             const isSelected = selectedAnswer === option;
-                                            const isCorrect = option === quiz.questions[currentQuestionIndex].correct_answer;
+                                            const isCorrect = idx === quiz.questions[currentQuestionIndex].correct_index;
 
                                             return (
                                                 <button
