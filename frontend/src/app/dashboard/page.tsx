@@ -123,8 +123,13 @@ export default function DashboardPage() {
         }
 
         setUser({ email: session.user.email || '' });
-        await fetchCourses();
-        await fetchSuggestions();
+
+        // Run API calls in parallel for faster loading
+        await Promise.all([
+            fetchCourses(),
+            fetchSuggestions()
+        ]);
+
         setLoading(false);
     };
 
