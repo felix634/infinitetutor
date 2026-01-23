@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Sparkles, Brain, Clock, Target } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -25,6 +25,16 @@ export default function IntakeWizard() {
     });
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    // Check for suggested topic from dashboard and pre-fill
+    useEffect(() => {
+        const suggestedTopic = localStorage.getItem('suggested_topic');
+        if (suggestedTopic) {
+            setFormData(prev => ({ ...prev, topic: suggestedTopic }));
+            // Clear it so it doesn't persist on page refresh
+            localStorage.removeItem('suggested_topic');
+        }
+    }, []);
 
     const steps: Step[] = ['topic', 'level', 'time'];
     const currentIndex = steps.indexOf(step);

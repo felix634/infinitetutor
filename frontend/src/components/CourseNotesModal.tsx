@@ -69,6 +69,16 @@ export default function CourseNotesModal({ isOpen, onClose, courseId, courseTitl
         });
     };
 
+    // Helper to decode lesson ID safely - handles URL encoding like %20 for spaces
+    const decodeLessonName = (lessonId: string) => {
+        try {
+            return decodeURIComponent(lessonId);
+        } catch {
+            // If decoding fails, return as-is
+            return lessonId;
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -141,7 +151,7 @@ export default function CourseNotesModal({ isOpen, onClose, courseId, courseTitl
                                                 <ChevronRight size={18} className="text-slate-400" />
                                             )}
                                             <span className="font-medium text-white flex-1 truncate">
-                                                {note.lesson_id}
+                                                {decodeLessonName(note.lesson_id)}
                                             </span>
                                             <span className="text-xs text-slate-500">
                                                 {new Date(note.updated_at).toLocaleDateString()}
