@@ -40,7 +40,7 @@ export default function CourseNotesModal({ isOpen, onClose, courseId, courseTitl
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) return;
 
-            const response = await fetch(`${api.notes}?course_id=${encodeURIComponent(courseId)}`, {
+            const response = await fetch(api.notes(courseId), {
                 headers: getSupabaseHeaders(session.access_token),
             });
 

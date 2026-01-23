@@ -1,0 +1,8 @@
+package-lock.json
+yarn.lock
+node_modules/
+dist/
+build/
+*.csv
+*.log
+*.json  # Only if you have massive data files

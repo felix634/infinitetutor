@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Pencil, Save, Eye, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { api } from '@/lib/api';
+import { api, getSupabaseHeaders } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 interface NotesPanelProps {
@@ -30,7 +30,7 @@ export default function NotesPanel({ courseId, lessonId }: NotesPanelProps) {
         if (session?.access_token) {
             try {
                 const response = await fetch(api.notes(courseId, lessonId), {
-                    headers: { 'Authorization': `Bearer ${session.access_token}` }
+                    headers: getSupabaseHeaders(session.access_token)
                 });
                 if (response.ok) {
                     const data = await response.json();
@@ -52,10 +52,7 @@ export default function NotesPanel({ courseId, lessonId }: NotesPanelProps) {
         try {
             await fetch(api.notes(courseId, lessonId), {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}`
-                },
+                headers: getSupabaseHeaders(session.access_token),
                 body: JSON.stringify({ content })
             });
             setLastSaved(new Date());
@@ -112,8 +109,8 @@ export default function NotesPanel({ courseId, lessonId }: NotesPanelProps) {
                     <button
                         onClick={() => setIsPreview(!isPreview)}
                         className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${isPreview
-                                ? 'bg-[#2AB7CA] text-white'
-                                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                            ? 'bg-[#2AB7CA] text-white'
+                            : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
                             }`}
                     >
                         <Eye size={14} />

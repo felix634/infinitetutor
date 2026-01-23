@@ -20,7 +20,11 @@ export const api = {
     courses: `${FUNCTIONS_URL}/courses`,
     course: (id: string) => `${FUNCTIONS_URL}/courses?course_id=${id}`,
     saveCourse: `${FUNCTIONS_URL}/courses`,
-    notes: (courseId: string, lessonId: string) => `${FUNCTIONS_URL}/notes?course_id=${courseId}&lesson_id=${lessonId}`,
+    notes: (courseId: string, lessonId?: string) => {
+        let url = `${FUNCTIONS_URL}/notes?course_id=${encodeURIComponent(courseId)}`;
+        if (lessonId) url += `&lesson_id=${encodeURIComponent(lessonId)}`;
+        return url;
+    },
     stats: `${FUNCTIONS_URL}/stats`,
     activity: `${FUNCTIONS_URL}/stats`,
     suggestions: `${FUNCTIONS_URL}/suggestions`,
