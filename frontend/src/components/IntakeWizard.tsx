@@ -26,11 +26,13 @@ export default function IntakeWizard() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    // Check for suggested topic from dashboard and pre-fill
+    // Check for suggested topic from dashboard and pre-fill + skip to level step
     useEffect(() => {
         const suggestedTopic = localStorage.getItem('suggested_topic');
         if (suggestedTopic) {
             setFormData(prev => ({ ...prev, topic: suggestedTopic }));
+            // Skip directly to level step since topic is already chosen
+            setStep('level');
             // Clear it so it doesn't persist on page refresh
             localStorage.removeItem('suggested_topic');
         }
