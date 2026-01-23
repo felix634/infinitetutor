@@ -42,25 +42,40 @@ serve(async (req) => {
     const courseId = params.get("course_id");
     const lessonId = params.get("lesson_id");
 
-    if (!courseId || !lessonId) {
+    if (!courseId) {
         return new Response(
-            JSON.stringify({ error: "Missing course_id or lesson_id" }),
+            JSON.stringify({ error: "Missing course_id" }),
             { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
     }
 
     try {
-        // GET - Retrieve note
+        // GET - Retrieve notes
         if (req.method === "GET") {
+            // If lesson_id is provided, get single note
+            if (lessonId) {
+                const { data } = await supabase
+                    .from("user_notes")
+                    .select("content")
+                    .eq("user_email", userEmail)
+                    .eq("course_id", courseId)
+                    .eq("lesson_id", lessonId)
+                    .single();
+
+                return new Response(JSON.stringify({ content: data?.content || "" }), {
+                    headers: { ...corsHeaders, "Content-Type": "application/json" },
+                });
+            }
+
+            // If no lesson_id, get all notes for the course
             const { data } = await supabase
                 .from("user_notes")
-                .select("content")
+                .select("lesson_id, content, updated_at")
                 .eq("user_email", userEmail)
                 .eq("course_id", courseId)
-                .eq("lesson_id", lessonId)
-                .single();
+                .order("updated_at", { ascending: true });
 
-            return new Response(JSON.stringify({ content: data?.content || "" }), {
+            return new Response(JSON.stringify({ notes: data || [] }), {
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
         }

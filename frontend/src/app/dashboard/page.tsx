@@ -7,13 +7,14 @@ import {
     BookOpen, Plus, ChevronRight,
     Loader2, Clock, TrendingUp, Lightbulb, GraduationCap,
     BarChart3, Trophy, Medal, Star, Flame, Zap, Crown,
-    Award, Target, Rocket, Brain, Gem, Shield
+    Award, Target, Rocket, Brain, Gem, Shield, FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Header from '@/components/Header';
 import StatsWidget from '@/components/StatsWidget';
 import { api, getSupabaseHeaders } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import CourseNotesModal from '@/components/CourseNotesModal';
 
 interface Course {
     course_id: string;
@@ -106,6 +107,7 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [loadingSuggestions, setLoadingSuggestions] = useState(false);
     const [activeTab, setActiveTab] = useState<Tab>('progress');
+    const [notesModalCourse, setNotesModalCourse] = useState<Course | null>(null);
 
     const inProgressCourses = courses.filter(c => c.progress_percent < 100);
     const completedCourses = courses.filter(c => c.progress_percent >= 100);
@@ -380,6 +382,19 @@ export default function DashboardPage() {
                                                                     {course.progress_percent}%
                                                                 </span>
                                                             </div>
+
+                                                            {/* Notes Button */}
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setNotesModalCourse(course);
+                                                                }}
+                                                                className="p-2 rounded-xl hover:bg-white/10 transition-colors group/notes"
+                                                                title="View notes"
+                                                            >
+                                                                <FileText size={18} className="text-slate-400 group-hover/notes:text-[#2AB7CA]" />
+                                                            </button>
+
                                                             <ChevronRight className="text-slate-500 group-hover:text-[#2AB7CA] group-hover:translate-x-1 transition-all" />
                                                         </div>
                                                     </div>
@@ -546,6 +561,14 @@ export default function DashboardPage() {
                     )}
                 </AnimatePresence>
             </main>
+
+            {/* Course Notes Modal */}
+            <CourseNotesModal
+                isOpen={!!notesModalCourse}
+                onClose={() => setNotesModalCourse(null)}
+                courseId={notesModalCourse?.course_id || ''}
+                courseTitle={notesModalCourse?.title || ''}
+            />
         </div>
     );
 }
