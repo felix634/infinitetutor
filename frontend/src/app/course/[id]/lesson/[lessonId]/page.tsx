@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, ChevronRight, Zap, Info, PlayCircle, Trophy, CheckCircle2 } from 'lucide-react';
+import { BookOpen, ChevronRight, ChevronLeft, Zap, Info, PlayCircle, Trophy, CheckCircle2, Clock, Maximize2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import MermaidRenderer from '@/components/MermaidRenderer';
 import QuizModal from '@/components/QuizModal';
+import DiagramViewerModal from '@/components/DiagramViewerModal';
 import NotesPanel from '@/components/NotesPanel';
 import Header from '@/components/Header';
 import { api, getSupabaseHeaders } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
+import { estimateReadingMinutes } from '@/lib/utils';
 
 interface LessonContent {
     lesson_title: string;
@@ -26,9 +28,12 @@ export default function LessonPage() {
     const [content, setContent] = useState<LessonContent | null>(null);
     const [loading, setLoading] = useState(true);
     const [isQuizOpen, setIsQuizOpen] = useState(false);
+    const [isDiagramOpen, setIsDiagramOpen] = useState(false);
     const [courseTitle, setCourseTitle] = useState('');
     const [isPassed, setIsPassed] = useState(false);
+    const [scrollProgress, setScrollProgress] = useState(0);
     const lessonStartTime = useRef<number>(Date.now());
+    const scrollSaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // Log activity to stats endpoint
     const logActivity = async (minutes: number, lessons: number) => {
@@ -46,6 +51,37 @@ export default function LessonPage() {
             }
         }
     };
+
+    type NavLesson = { title: string; chapterIdx: number; lessonIdx: number };
+    const getPrevNext = useCallback((): { prev: NavLesson | null; next: NavLesson | null } => {
+        const raw = localStorage.getItem('current_course');
+        if (!raw) return { prev: null, next: null };
+        const course = JSON.parse(raw) as { course_id: string; chapters: { id: string; title: string; lessons: string[] }[] };
+        const chapters = course?.chapters || [];
+        const flat: NavLesson[] = [];
+        chapters.forEach((ch, ci) => ch.lessons.forEach((t, li) => flat.push({ title: t, chapterIdx: ci, lessonIdx: li })));
+        const current = decodeURIComponent(params.lessonId as string);
+        const idx = flat.findIndex((l) => l.title === current);
+        if (idx < 0) return { prev: null, next: null };
+        return { prev: idx > 0 ? flat[idx - 1]! : null, next: idx < flat.length - 1 ? flat[idx + 1]! : null };
+    }, [params.lessonId]);
+
+    const [nav, setNav] = useState<{ prev: NavLesson | null; next: NavLesson | null }>({ prev: null, next: null });
+
+    const scrollStorageKey = useCallback(() => {
+        const c = localStorage.getItem('current_course');
+        if (!c) return null;
+        const { course_id } = JSON.parse(c) as { course_id: string };
+        return `lesson_scroll_${course_id}_${encodeURIComponent(decodeURIComponent(params.lessonId as string))}`;
+    }, [params.lessonId]);
+
+    const saveScroll = useCallback(() => {
+        const key = scrollStorageKey();
+        if (!key) return;
+        try {
+            localStorage.setItem(key, String(window.scrollY));
+        } catch { /* ignore */ }
+    }, [scrollStorageKey]);
 
     useEffect(() => {
         const savedCourse = localStorage.getItem('current_course');
@@ -66,6 +102,43 @@ export default function LessonPage() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params.lessonId]);
+
+    useEffect(() => {
+        const raw = localStorage.getItem('current_course');
+        if (raw) setNav(getPrevNext());
+    }, [params.lessonId, params.id, getPrevNext]);
+
+    useEffect(() => {
+        if (loading || !content) return;
+        const key = scrollStorageKey();
+        const saved = key ? localStorage.getItem(key) : null;
+        const y = saved ? Math.max(0, parseInt(saved, 10) || 0) : 0;
+        const restore = () => {
+            window.scrollTo(0, y);
+        };
+        if (typeof requestAnimationFrame !== 'undefined') requestAnimationFrame(restore);
+        else setTimeout(restore, 0);
+
+        const onScroll = () => {
+            const { scrollHeight, clientHeight } = document.documentElement;
+            const max = Math.max(0, scrollHeight - clientHeight);
+            setScrollProgress(max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0);
+            if (scrollSaveTimeout.current) clearTimeout(scrollSaveTimeout.current);
+            scrollSaveTimeout.current = setTimeout(saveScroll, 300);
+        };
+        const onBeforeUnload = () => { saveScroll(); };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('beforeunload', onBeforeUnload);
+        onScroll();
+
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('beforeunload', onBeforeUnload);
+            if (scrollSaveTimeout.current) clearTimeout(scrollSaveTimeout.current);
+        };
+    }, [loading, content, saveScroll, scrollStorageKey]);
+
     const [error, setError] = useState<string | null>(null);
 
     const fetchLessonContent = async (title: string, topic: string, courseId: string) => {
@@ -130,10 +203,7 @@ export default function LessonPage() {
                 try {
                     await fetch(api.saveCourse, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${session.access_token}`
-                        },
+                        headers: getSupabaseHeaders(session.access_token),
                         body: JSON.stringify({
                             course_id: course.course_id,
                             title: course.title,
@@ -184,9 +254,22 @@ export default function LessonPage() {
 
     if (!content) return null;
 
+    const readingMinutes = estimateReadingMinutes(content?.content_markdown ?? '');
+    const courseId = params.id as string;
+
     return (
         <div className="min-h-screen bg-[#0B0C10] text-slate-50">
             <Header />
+
+            {/* Scroll progress bar */}
+            <div className="fixed top-0 left-0 right-0 h-1 bg-white/5 z-40">
+                <motion.div
+                    className="h-full bg-gradient-to-r from-[#2AB7CA] to-[#FED766]"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${scrollProgress}%` }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+            </div>
 
             <main className="pt-24 md:pt-32 pb-16 md:pb-24 px-4 md:px-6 max-w-7xl mx-auto">
                 {/* Two-column layout: Content + Notes sidebar */}
@@ -209,6 +292,10 @@ export default function LessonPage() {
                                 <p className="text-base md:text-xl text-slate-400 max-w-2xl leading-relaxed">
                                     {content.summary}
                                 </p>
+                                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                                    <Clock size={16} />
+                                    <span>~{readingMinutes} min read</span>
+                                </div>
                             </motion.div>
                         </section>
 
@@ -225,9 +312,19 @@ export default function LessonPage() {
 
                         {/* Visual Model */}
                         <section className="space-y-8">
-                            <div className="flex items-center gap-3">
-                                <Zap className="text-[#FED766]" size={24} />
-                                <h2 className="text-2xl font-bold">Visual Mental Model</h2>
+                            <div className="flex items-center justify-between gap-4 flex-wrap">
+                                <div className="flex items-center gap-3">
+                                    <Zap className="text-[#FED766]" size={24} />
+                                    <h2 className="text-2xl font-bold">Visual Mental Model</h2>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsDiagramOpen(true)}
+                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-[#2AB7CA]/20 border border-white/10 hover:border-[#2AB7CA]/30 text-slate-300 hover:text-[#2AB7CA] transition-all text-sm font-medium"
+                                >
+                                    <Maximize2 size={16} />
+                                    View full diagram
+                                </button>
                             </div>
                             <div className="glass-dark border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
                                 <MermaidRenderer chart={content.mermaid_code} />
@@ -255,7 +352,41 @@ export default function LessonPage() {
                 </div>
 
                 {/* Footer / Quiz Trigger */}
-                <section className="pt-12">
+                <section className="pt-12 space-y-6">
+                    {/* Prev / Next navigation */}
+                    <div className="flex items-center justify-between gap-4">
+                        {nav.prev ? (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    saveScroll();
+                                    router.push(`/course/${courseId}/lesson/${encodeURIComponent(nav.prev!.title)}`);
+                                }}
+                                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all font-medium"
+                            >
+                                <ChevronLeft size={18} />
+                                Previous lesson
+                            </button>
+                        ) : (
+                            <div />
+                        )}
+                        {nav.next ? (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    saveScroll();
+                                    router.push(`/course/${courseId}/lesson/${encodeURIComponent(nav.next!.title)}`);
+                                }}
+                                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all font-medium ml-auto"
+                            >
+                                Next lesson
+                                <ChevronRight size={18} />
+                            </button>
+                        ) : (
+                            <div />
+                        )}
+                    </div>
+
                     <div className="glass-dark border border-[#2AB7CA]/30 rounded-[3rem] p-12 text-center space-y-8 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-[#2AB7CA]/10 blur-[100px] -mr-32 -mt-32 rounded-full" />
 
@@ -270,7 +401,10 @@ export default function LessonPage() {
                                         You've completed the quiz and demonstrated proficiency in these concepts. Ready for the next one?
                                     </p>
                                     <button
-                                        onClick={() => router.back()}
+                                        onClick={() => {
+                                            saveScroll();
+                                            router.back();
+                                        }}
                                         className="inline-flex items-center gap-2 bg-[#2AB7CA] hover:bg-indigo-600 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl shadow-[#2AB7CA]/20"
                                     >
                                         Return to Dashboard
@@ -299,6 +433,13 @@ export default function LessonPage() {
                     </div>
                 </section>
             </main>
+
+            <DiagramViewerModal
+                isOpen={isDiagramOpen}
+                onClose={() => setIsDiagramOpen(false)}
+                lessonTitle={content.lesson_title}
+                mermaidCode={content.mermaid_code}
+            />
 
             <QuizModal
                 isOpen={isQuizOpen}
