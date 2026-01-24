@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Flame, Target, Clock, Trophy } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, getSupabaseHeaders } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 interface Stats {
@@ -26,9 +26,11 @@ export default function StatsWidget() {
         if (session?.access_token) {
             try {
                 const response = await fetch(api.stats, {
-                    headers: { 'Authorization': `Bearer ${session.access_token}` }
+                    headers: getSupabaseHeaders(session.access_token)
                 });
-                if (response.ok) {
+                if (!response.ok) {
+                    console.warn('Stats fetch failed', response.status);
+                } else {
                     const data = await response.json();
                     setStats(data);
                 }

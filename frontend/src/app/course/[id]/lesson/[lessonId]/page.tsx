@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, ChevronRight, Zap, Info, PlayCircle, Trophy, CheckCircle2 } from 'lucide-react';
@@ -9,7 +9,7 @@ import MermaidRenderer from '@/components/MermaidRenderer';
 import QuizModal from '@/components/QuizModal';
 import NotesPanel from '@/components/NotesPanel';
 import Header from '@/components/Header';
-import { api } from '@/lib/api';
+import { api, getSupabaseHeaders } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 
 interface LessonContent {
@@ -28,6 +28,24 @@ export default function LessonPage() {
     const [isQuizOpen, setIsQuizOpen] = useState(false);
     const [courseTitle, setCourseTitle] = useState('');
     const [isPassed, setIsPassed] = useState(false);
+    const lessonStartTime = useRef<number>(Date.now());
+
+    // Log activity to stats endpoint
+    const logActivity = async (minutes: number, lessons: number) => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+            try {
+                await fetch(api.stats, {
+                    method: 'POST',
+                    headers: getSupabaseHeaders(session.access_token),
+                    body: JSON.stringify({ minutes, lessons })
+                });
+                console.log('✅ Activity logged:', { minutes, lessons });
+            } catch (err) {
+                console.error('Failed to log activity:', err);
+            }
+        }
+    };
 
     useEffect(() => {
         const savedCourse = localStorage.getItem('current_course');
@@ -86,6 +104,13 @@ export default function LessonPage() {
 
     const handlePass = async () => {
         setIsPassed(true);
+
+        // Calculate time spent on lesson (in minutes, minimum 1)
+        const minutesSpent = Math.max(1, Math.round((Date.now() - lessonStartTime.current) / 60000));
+
+        // Log activity for stats (time + 1 lesson completed)
+        await logActivity(minutesSpent, 1);
+
         const urlLessonTitle = decodeURIComponent(params.lessonId as string);
         const progress = JSON.parse(localStorage.getItem('course_progress') || '{}');
         progress[urlLessonTitle] = true;
