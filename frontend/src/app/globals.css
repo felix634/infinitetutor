@@ -99,4 +99,43 @@
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+
+  /* Markdown table styles */
+  .markdown-content table {
+    @apply w-full border-collapse my-6 rounded-xl overflow-hidden;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .markdown-content thead {
+    background: linear-gradient(135deg, rgba(42, 183, 202, 0.2), rgba(42, 183, 202, 0.1));
+    border-bottom: 1px solid rgba(42, 183, 202, 0.3);
+  }
+
+  .markdown-content th {
+    @apply px-4 py-3 text-left text-sm font-bold uppercase tracking-wider;
+    color: #2AB7CA;
+  }
+
+  .markdown-content td {
+    @apply px-4 py-3 text-sm;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .markdown-content tbody tr {
+    transition: background-color 0.15s ease;
+  }
+
+  .markdown-content tbody tr:hover {
+    background: rgba(42, 183, 202, 0.05);
+  }
+
+  .markdown-content tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Alternate row coloring */
+  .markdown-content tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.01);
+  }
 }

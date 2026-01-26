@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, ChevronRight, ChevronLeft, Zap, Info, PlayCircle, Trophy, CheckCircle2, Clock, Maximize2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import MermaidRenderer from '@/components/MermaidRenderer';
 import QuizModal from '@/components/QuizModal';
 import DiagramViewerModal from '@/components/DiagramViewerModal';
@@ -303,7 +304,7 @@ export default function LessonPage() {
                         <section className="prose prose-invert prose-indigo max-w-none">
                             <div className="glass-dark border border-white/5 rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 lg:p-12 shadow-2xl space-y-6 md:space-y-8">
                                 <div className="text-slate-300 text-base md:text-lg leading-relaxed space-y-6 markdown-content">
-                                    <ReactMarkdown>
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                         {content.content_markdown}
                                     </ReactMarkdown>
                                 </div>
@@ -371,17 +372,25 @@ export default function LessonPage() {
                             <div />
                         )}
                         {nav.next ? (
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    saveScroll();
-                                    router.push(`/course/${courseId}/lesson/${encodeURIComponent(nav.next!.title)}`);
-                                }}
-                                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all font-medium ml-auto"
-                            >
-                                Next lesson
-                                <ChevronRight size={18} />
-                            </button>
+                            isPassed ? (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        saveScroll();
+                                        router.push(`/course/${courseId}/lesson/${encodeURIComponent(nav.next!.title)}`);
+                                    }}
+                                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all font-medium ml-auto"
+                                >
+                                    Next lesson
+                                    <ChevronRight size={18} />
+                                </button>
+                            ) : (
+                                <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-500 font-medium ml-auto cursor-not-allowed" title="Complete the quiz to unlock">
+                                    <span className="text-xs">🔒</span>
+                                    Next lesson
+                                    <ChevronRight size={18} />
+                                </div>
+                            )
                         ) : (
                             <div />
                         )}
