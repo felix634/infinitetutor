@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, ChevronRight, ChevronLeft, Zap, Info, PlayCircle, Trophy, CheckCircle2, Clock, Maximize2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import MermaidRenderer from '@/components/MermaidRenderer';
+import ReactFlowDiagram from '@/components/ReactFlowDiagram';
 import QuizModal from '@/components/QuizModal';
 import DiagramViewerModal from '@/components/DiagramViewerModal';
 import NotesPanel from '@/components/NotesPanel';
@@ -328,7 +328,7 @@ export default function LessonPage() {
                                 </button>
                             </div>
                             <div className="glass-dark border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
-                                <MermaidRenderer chart={content.mermaid_code} />
+                                <ReactFlowDiagram mermaidCode={content.mermaid_code} showMiniMap={false} />
                                 <div className="mt-8 flex gap-4 p-6 bg-[#2AB7CA]/10 border border-[#2AB7CA]/20 rounded-2xl">
                                     <Info className="text-[#2AB7CA] shrink-0" size={20} />
                                     <p className="text-slate-400 text-sm leading-relaxed">

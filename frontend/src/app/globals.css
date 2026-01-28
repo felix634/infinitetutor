@@ -138,4 +138,34 @@
   .markdown-content tbody tr:nth-child(even) {
     background: rgba(255, 255, 255, 0.01);
   }
+
+  /* React Flow controls styling */
+  .react-flow__controls {
+    background: #0B0C10 !important;
+    border: 1px solid rgba(42, 183, 202, 0.3) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .react-flow__controls-button {
+    background: #0B0C10 !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(42, 183, 202, 0.2) !important;
+    fill: #2AB7CA !important;
+    color: #2AB7CA !important;
+  }
+
+  .react-flow__controls-button:hover {
+    background: rgba(42, 183, 202, 0.2) !important;
+  }
+
+  .react-flow__controls-button:last-child {
+    border-bottom: none !important;
+  }
+
+  .react-flow__controls-button svg {
+    fill: #2AB7CA !important;
+    max-width: 14px;
+    max-height: 14px;
+  }
 }
