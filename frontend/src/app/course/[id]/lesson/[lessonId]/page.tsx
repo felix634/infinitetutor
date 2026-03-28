@@ -148,7 +148,7 @@ export default function LessonPage() {
         try {
             const response = await fetch(api.generateLesson, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getSupabaseHeaders(),
                 body: JSON.stringify({
                     lesson_title: title,
                     topic,
