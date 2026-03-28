@@ -11,7 +11,7 @@ import QuizModal from '@/components/QuizModal';
 import DiagramViewerModal from '@/components/DiagramViewerModal';
 import NotesPanel from '@/components/NotesPanel';
 import Header from '@/components/Header';
-import { api, getSupabaseHeaders } from '@/lib/api';
+import { api, getSupabaseHeaders, fetchWithRetry } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
 import { estimateReadingMinutes } from '@/lib/utils';
 
@@ -146,7 +146,7 @@ export default function LessonPage() {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(api.generateLesson, {
+            const response = await fetchWithRetry(api.generateLesson, {
                 method: 'POST',
                 headers: getSupabaseHeaders(),
                 body: JSON.stringify({

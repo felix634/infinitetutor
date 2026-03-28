@@ -36,3 +36,32 @@ export const api = {
     generateQuiz: `${FUNCTIONS_URL}/generate-quiz`,
     generateDiagram: `${FUNCTIONS_URL}/generate-diagram`,
 };
+
+// Retry wrapper for Supabase Edge Functions (handles cold starts)
+export async function fetchWithRetry(
+    url: string,
+    options: RequestInit,
+    maxRetries = 2
+): Promise<Response> {
+    let lastError: Error | null = null;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch(url, options);
+            if (response.ok) return response;
+            // On server errors (5xx), retry; on client errors (4xx), don't
+            if (response.status >= 500 && attempt < maxRetries) {
+                console.warn(`Attempt ${attempt + 1} failed (${response.status}), retrying...`);
+                await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+                continue;
+            }
+            return response; // Return non-retryable error responses as-is
+        } catch (err) {
+            lastError = err instanceof Error ? err : new Error(String(err));
+            if (attempt < maxRetries) {
+                console.warn(`Attempt ${attempt + 1} failed (${lastError.message}), retrying...`);
+                await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
+            }
+        }
+    }
+    throw lastError || new Error('Request failed after retries');
+}

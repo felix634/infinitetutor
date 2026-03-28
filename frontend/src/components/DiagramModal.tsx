@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, Download, Info } from 'lucide-react';
 import MermaidRenderer from './MermaidRenderer';
-import { api, getSupabaseHeaders } from '@/lib/api';
+import { api, getSupabaseHeaders, fetchWithRetry } from '@/lib/api';
 
 interface DiagramResponse {
     lesson_title: string;
@@ -36,7 +36,7 @@ export default function DiagramModal({ isOpen, onClose, lessonTitle, topic, leve
     const fetchDiagram = async () => {
         setLoading(true);
         try {
-            const response = await fetch(api.generateDiagram, {
+            const response = await fetchWithRetry(api.generateDiagram, {
                 method: 'POST',
                 headers: getSupabaseHeaders(),
                 body: JSON.stringify({ lesson_title: lessonTitle, topic, level }),
